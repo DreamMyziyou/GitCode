@@ -7,13 +7,11 @@
 
 #include "ClassDefine.h"
 #include "CommonExport.h"
+#include "IModule.h"
 
-class COMMON_API CommonModule
+class COMMON_API CommonModule : public IModule
 {
     SINGLETON_CLASS(CommonModule)
-
-public:
-    void test();
 };
 
 

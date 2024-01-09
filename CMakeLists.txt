@@ -11,7 +11,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/bin)
 
-include_directories(${CMAKE_CURRENT_LIST_DIR})
+include_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/Source)
 
-add_subdirectory(Common)
-add_subdirectory(App)
+add_subdirectory(Source/Platform)
+add_subdirectory(Source/Common)
+add_subdirectory(Source/App)

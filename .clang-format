@@ -18,6 +18,7 @@ AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: true
+  AfterStruct: true
   AfterClass: true
   AfterControlStatement: Always
   AfterEnum: true

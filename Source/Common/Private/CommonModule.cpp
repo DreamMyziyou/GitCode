@@ -3,7 +3,3 @@
 //
 
 #include "CommonModule.h"
-
-void CommonModule::test()
-{
-}
