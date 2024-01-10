@@ -1,1 +1,5 @@
-# 个人仓库
+# Personal Repository
+
+***
+
++ This code repository is for learning and communication purposes only

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(GitWorkspace)
+project(WorkEngine)
 
 include(CmakeUtils/ModuleFunction.cmake)
 
@@ -14,6 +14,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/bin)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/ThirdParty)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/Source)
 
-add_subdirectory(Source/Platform)
-add_subdirectory(Source/Common)
-add_subdirectory(Source/App)
+add_subdirectory(ThirdParty)
+add_subdirectory(Source)
