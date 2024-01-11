@@ -1,4 +1,10 @@
-function(make_module MODULE_NAME MODULE_DIR)
+function(make_static_module MODULE_NAME MODULE_DIR)
+    # add library
+    file(GLOB_RECURSE CPP_SOURCES "*.h" "*.cpp")
+    add_library(${MODULE_NAME} STATIC ${CPP_SOURCES})
+endfunction()
+
+function(make_shared_module MODULE_NAME MODULE_DIR)
     # add build definition
     set(BUILD_DEFINITION "${MODULE_NAME}_build")
     string(TOUPPER ${BUILD_DEFINITION} BUILD_DEFINITION)

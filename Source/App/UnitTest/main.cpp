@@ -2,6 +2,7 @@
 // Created by chenwei on 2024/1/9.
 //
 
+#include "CommonCore.h"
 #include "gtest/gtest.h"
 
 int main(int argc, char* argv[])
@@ -12,5 +13,8 @@ int main(int argc, char* argv[])
 
 TEST(UnitTest, Test01)
 {
-    EXPECT_EQ(0, 0.0);
+    int32 test01 = 1;
+    int test02 = 1;
+
+    EXPECT_TRUE(test01 == test02);
 }

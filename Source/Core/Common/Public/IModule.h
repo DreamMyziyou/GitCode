@@ -2,8 +2,8 @@
 // Created by chenwei on 2024/1/9.
 //
 
-#ifndef GITWORKSPACE_IMODULE_H
-#define GITWORKSPACE_IMODULE_H
+#ifndef WORKENGINE_IMODULE_H
+#define WORKENGINE_IMODULE_H
 
 struct IModule
 {
@@ -12,4 +12,4 @@ struct IModule
     virtual void ShutdownModule() {}
 };
 
-#endif//GITWORKSPACE_IMODULE_H
+#endif//WORKENGINE_IMODULE_H

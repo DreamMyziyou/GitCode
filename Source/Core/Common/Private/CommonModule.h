@@ -2,8 +2,8 @@
 // Created by chenwei on 2023/11/19.
 //
 
-#ifndef GITWORKSPACE_COMMONMODULE_H
-#define GITWORKSPACE_COMMONMODULE_H
+#ifndef WORKENGINE_COMMONMODULE_H
+#define WORKENGINE_COMMONMODULE_H
 
 #include "ClassDefine.h"
 #include "CommonExport.h"
@@ -15,4 +15,4 @@ class COMMON_API CommonModule : public IModule
 };
 
 
-#endif//GITWORKSPACE_COMMONMODULE_H
+#endif//WORKENGINE_COMMONMODULE_H

@@ -2,8 +2,8 @@
 // Created by chenwei on 2023/11/19.
 //
 
-#ifndef GITWORKSPACE_CLASSDEFINE_H
-#define GITWORKSPACE_CLASSDEFINE_H
+#ifndef WORKENGINE_CLASSDEFINE_H
+#define WORKENGINE_CLASSDEFINE_H
 
 #define SINGLETON_CLASS(CLASS_NAME)                    \
 private:                                               \
@@ -18,4 +18,4 @@ public:                                                \
         static CLASS_NAME gInstance;                   \
         return gInstance;                              \
     }
-#endif//GITWORKSPACE_CLASSDEFINE_H
+#endif//WORKENGINE_CLASSDEFINE_H
