@@ -1,8 +1,11 @@
-# IDE目录
+# ide
 /.vs
 /.vscode
 /.idea
 
-# 输出目录
+# output
 /out
 /cmake-build-debug
+
+# third party
+/ThirdParty/googletest

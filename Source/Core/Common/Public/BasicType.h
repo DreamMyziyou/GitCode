@@ -2,8 +2,8 @@
 // Created by chenwei on 2024/1/10.
 //
 
-#ifndef WORKENGINE_GENERICPLATFORM_H
-#define WORKENGINE_GENERICPLATFORM_H
+#ifndef WORKENGINE_BASICTYPE_H
+#define WORKENGINE_BASICTYPE_H
 
 using uint8 = unsigned char;
 using uint16 = unsigned short int;
@@ -14,4 +14,4 @@ using int16 = signed short int;
 using int32 = signed int;
 using int64 = signed long long;
 
-#endif//WORKENGINE_GENERICPLATFORM_H
+#endif//WORKENGINE_BASICTYPE_H

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "CommonCore.h"
+#include "Core.h"
 
 using namespace std;
 
