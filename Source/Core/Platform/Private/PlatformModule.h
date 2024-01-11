@@ -5,6 +5,7 @@
 #ifndef GITWORKSPACE_PLATFORMMODULE_H
 #define GITWORKSPACE_PLATFORMMODULE_H
 
+
 #include "ClassDefine.h"
 #include "IModule.h"
 #include "PlatformExport.h"

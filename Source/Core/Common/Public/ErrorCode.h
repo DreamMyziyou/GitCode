@@ -5,11 +5,12 @@
 #ifndef WORKENGINE_ERRORCODE_H
 #define WORKENGINE_ERRORCODE_H
 
+
 #include "BasicType.h"
 
-enum class ErrorCode : uint32
+enum class ErrorCode : uint16
 {
-    Success,
+    Success = 0,
 
     Default = Success
 };
