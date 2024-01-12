@@ -9,3 +9,4 @@
 
 # third party
 /ThirdParty/googletest
+/ThirdParty/boost

@@ -6,9 +6,9 @@
 #define WORKENGINE_COREMODULE_H
 
 
-#include "ClassDefine.h"
-#include "CoreExport.h"
-#include "IModule.h"
+#include "Core/Common/ClassDefine.h"
+#include "Core/Common/IModule.h"
+#include "Core/Core/CoreExport.h"
 
 class CoreModule
 {

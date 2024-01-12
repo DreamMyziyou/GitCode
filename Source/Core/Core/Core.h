@@ -6,7 +6,7 @@
 #define WORKENGINE_CORE_H
 
 
-#include "BasicType.h"
+#include "Core/BasicType/BasicType.h"
 
 
 #endif//WORKENGINE_CORE_H
