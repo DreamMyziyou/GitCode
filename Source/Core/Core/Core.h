@@ -5,6 +5,6 @@
 #ifndef WORKENGINE_CORE_H
 #define WORKENGINE_CORE_H
 
-#include "Core/BasicType/BasicType.h"
+#include "BasicType/BasicType.h"
 
 #endif  // WORKENGINE_CORE_H

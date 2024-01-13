@@ -5,9 +5,9 @@
 #ifndef GITWORKSPACE_PLATFORMMODULE_H
 #define GITWORKSPACE_PLATFORMMODULE_H
 
-#include "Core/Common/ClassDefine.h"
-#include "Core/Common/IModule.h"
-#include "Core/Platform/PlatformExport.h"
+#include "Common/ClassDefine.h"
+#include "Common/IModule.h"
+#include "PlatformExport.h"
 
 class PLATFORM_API PlatformModule : public IModule
 {

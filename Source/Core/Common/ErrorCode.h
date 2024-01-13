@@ -5,7 +5,7 @@
 #ifndef WORKENGINE_ERRORCODE_H
 #define WORKENGINE_ERRORCODE_H
 
-#include "Core/BasicType/BasicType.h"
+#include "BasicType/BasicType.h"
 
 enum class ErrorCode : uint16
 {

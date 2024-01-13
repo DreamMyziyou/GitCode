@@ -20,8 +20,3 @@ Checks: >
   readability-redundant-preprocessor,
   readability-redundant-smartptr-get,
   readability-static-accessed-through-instance
-CheckOptions:
-  - key: llvm-namespace-comment.ShortNamespaceLines
-    value: 40
-  - key: llvm-namespace-comment.SpacesBeforeComments
-    value: 2

@@ -5,9 +5,9 @@
 #ifndef WORKENGINE_COMMONMODULE_H
 #define WORKENGINE_COMMONMODULE_H
 
-#include "Core/Common/ClassDefine.h"
-#include "Core/Common/CommonExport.h"
-#include "Core/Common/IModule.h"
+#include "ClassDefine.h"
+#include "CommonExport.h"
+#include "IModule.h"
 
 class COMMON_API CommonModule : public IModule
 {

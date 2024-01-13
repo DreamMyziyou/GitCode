@@ -5,9 +5,9 @@
 #ifndef WORKENGINE_COREMODULE_H
 #define WORKENGINE_COREMODULE_H
 
-#include "Core/Common/ClassDefine.h"
-#include "Core/Common/IModule.h"
-#include "Core/Core/CoreExport.h"
+#include "Common/ClassDefine.h"
+#include "Common/IModule.h"
+#include "CoreExport.h"
 
 class CoreModule
 {
