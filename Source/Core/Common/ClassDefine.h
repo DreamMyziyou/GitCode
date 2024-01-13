@@ -5,7 +5,6 @@
 #ifndef WORKENGINE_CLASSDEFINE_H
 #define WORKENGINE_CLASSDEFINE_H
 
-
 #define SINGLETON_CLASS(CLASS_NAME)                    \
 private:                                               \
     CLASS_NAME() = default;                            \
@@ -20,5 +19,4 @@ public:                                                \
         return gInstance;                              \
     }
 
-
-#endif//WORKENGINE_CLASSDEFINE_H
+#endif  // WORKENGINE_CLASSDEFINE_H

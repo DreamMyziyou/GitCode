@@ -5,7 +5,6 @@
 #ifndef WORKENGINE_COREEXPORT_H
 #define WORKENGINE_COREEXPORT_H
 
-
 #ifdef _WIN32
 #ifdef CORE_BUILD
 #define CORE_API __declspec(dllexport)
@@ -16,5 +15,4 @@
 #define CORE_API
 #endif
 
-
-#endif//WORKENGINE_COREEXPORT_H
+#endif  // WORKENGINE_COREEXPORT_H

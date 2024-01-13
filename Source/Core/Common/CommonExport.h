@@ -5,7 +5,6 @@
 #ifndef WORKENGINE_COMMONEXPORT_H
 #define WORKENGINE_COMMONEXPORT_H
 
-
 #ifdef _WIN32
 #ifdef COMMON_BUILD
 #define COMMON_API __declspec(dllexport)
@@ -16,5 +15,4 @@
 #define COMMON_API
 #endif
 
-
-#endif//WORKENGINE_COMMONEXPORT_H
+#endif  // WORKENGINE_COMMONEXPORT_H
