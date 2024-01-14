@@ -1,2 +1,3 @@
+add_subdirectory(GameDemo)
 add_subdirectory(HelloWorld)
 add_subdirectory(UnitTest)
