@@ -15,15 +15,15 @@ class ModuleManager final
     SINGLETON_CLASS(ModuleManager)
 
 public:
-    void RegisterModule(std::shared_ptr<Module::IModule> module, std::vector<String> deps);
+    void RegisterModule(std::shared_ptr<Module::IModule> module, std::vector<size_t> deps);
 
 private:
     struct ModuleInfo
     {
         std::shared_ptr<Module::IModule> module;
-        std::vector<String> deps;
+        std::vector<size_t> deps;
     };
-    std::map<String, ModuleInfo> mModules;
+    std::map<size_t, ModuleInfo> mModules;
 };
 
 #endif  // WORKENGINE_MODULEMANAGER_H

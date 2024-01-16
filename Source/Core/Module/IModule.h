@@ -17,12 +17,11 @@ namespace Module
 struct IModule
 {
     virtual ~IModule() = default;
-    constexpr String GetClassName() const { return typeid(*this).name(); }
     virtual void StartupModule() {}
     virtual void ShutdownModule() {}
 };
 
-MODULE_API void RegisterModule(std::shared_ptr<IModule> module, std::vector<String> deps);
+MODULE_API void RegisterModule(std::shared_ptr<IModule> module, std::vector<size_t> deps);
 
 }  // namespace Module
 
