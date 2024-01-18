@@ -4,17 +4,23 @@
 
 #include "App.h"
 
-#include "Module/IModule.h"
+#include "Module/ModuleSingleton.h"
 
 using namespace std;
 
-class TestModule : public Module::IModule
+class TestModule01 : public Module::IModule
 {
+    SINGLETON_MODULE(TestModule01)
 };
 
-void App::Init()
+void App::Start()
 {
-    Module::RegisterModule(make_shared<TestModule>(), {});
+    TestModule01::instance();
 }
 
 void App::Run() {}
+
+void App::Stop()
+{
+    Module::GetManager()->ShutDownAllModule();
+}

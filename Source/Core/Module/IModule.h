@@ -21,7 +21,14 @@ struct IModule
     virtual void ShutdownModule() {}
 };
 
-MODULE_API void RegisterModule(std::shared_ptr<IModule> module, std::vector<size_t> deps);
+struct IManager
+{
+    virtual ~IManager() = default;
+    virtual void RegisterModule(std::shared_ptr<IModule> module) = 0;
+    virtual void ShutDownAllModule() = 0;
+};
+
+MODULE_API IManager* GetManager();
 
 }  // namespace Module
 

@@ -5,25 +5,21 @@
 #ifndef WORKENGINE_MODULEMANAGER_H
 #define WORKENGINE_MODULEMANAGER_H
 
-#include <map>
+#include <stack>
 
-#include "Common/ClassDefine.h"
+#include "Common/ClassMacro.h"
 #include "IModule.h"
 
-class ModuleManager final
+class ModuleManager final : public Module::IManager
 {
     SINGLETON_CLASS(ModuleManager)
 
 public:
-    void RegisterModule(std::shared_ptr<Module::IModule> module, std::vector<size_t> deps);
+    void RegisterModule(std::shared_ptr<Module::IModule> module) override;
+    void ShutDownAllModule() override;
 
 private:
-    struct ModuleInfo
-    {
-        std::shared_ptr<Module::IModule> module;
-        std::vector<size_t> deps;
-    };
-    std::map<size_t, ModuleInfo> mModules;
+    std::stack<std::shared_ptr<Module::IModule>> mModules;
 };
 
 #endif  // WORKENGINE_MODULEMANAGER_H

@@ -2,8 +2,8 @@
 // Created by chenwei on 2023/11/19.
 //
 
-#ifndef WORKENGINE_CLASSDEFINE_H
-#define WORKENGINE_CLASSDEFINE_H
+#ifndef WORKENGINE_CLASSMACRO_H
+#define WORKENGINE_CLASSMACRO_H
 
 #define SINGLETON_CLASS(CLASS_NAME)                    \
 private:                                               \
@@ -13,10 +13,10 @@ private:                                               \
     CLASS_NAME& operator=(const CLASS_NAME&) = delete; \
                                                        \
 public:                                                \
-    static CLASS_NAME& instance()                      \
+    static CLASS_NAME* instance()                      \
     {                                                  \
         static CLASS_NAME gInstance;                   \
-        return gInstance;                              \
+        return &gInstance;                             \
     }
 
-#endif  // WORKENGINE_CLASSDEFINE_H
+#endif  // WORKENGINE_CLASSMACRO_H

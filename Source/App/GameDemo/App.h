@@ -5,15 +5,16 @@
 #ifndef WORKENGINE_APP_H
 #define WORKENGINE_APP_H
 
-#include "Common/ClassDefine.h"
+#include "Common/ClassMacro.h"
 
 class App final
 {
     SINGLETON_CLASS(App)
 
 public:
-    void Init();
+    void Start();
     void Run();
+    void Stop();
 
 private:
 };

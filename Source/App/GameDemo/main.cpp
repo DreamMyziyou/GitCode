@@ -6,7 +6,8 @@
 
 int main(int argc, char** argv)
 {
-    App::instance().Init();
-    App::instance().Run();
+    App::instance()->Start();
+    App::instance()->Run();
+    App::instance()->Stop();
     return 0;
 }
