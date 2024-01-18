@@ -13,7 +13,7 @@ void ModuleManager::RegisterModule(std::shared_ptr<Module::IModule> module)
     mModules.push(module);
 }
 
-void ModuleManager::ShutDownAllModule()
+void ModuleManager::UnregisterAll()
 {
     while (!mModules.empty())
     {

@@ -22,5 +22,5 @@ void App::Run() {}
 
 void App::Stop()
 {
-    Module::GetManager()->ShutDownAllModule();
+    Module::GetManager()->UnregisterAll();
 }

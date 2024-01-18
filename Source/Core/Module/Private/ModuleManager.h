@@ -16,7 +16,7 @@ class ModuleManager final : public Module::IManager
 
 public:
     void RegisterModule(std::shared_ptr<Module::IModule> module) override;
-    void ShutDownAllModule() override;
+    void UnregisterAll() override;
 
 private:
     std::stack<std::shared_ptr<Module::IModule>> mModules;

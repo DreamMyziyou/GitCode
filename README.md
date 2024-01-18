@@ -10,7 +10,6 @@
 
 ## TODO
 
-+ ModuleManager
 + Logger
 + SignalCenter
 + ECS
