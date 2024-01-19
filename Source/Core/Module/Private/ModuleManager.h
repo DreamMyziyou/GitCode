@@ -15,11 +15,11 @@ class ModuleManager final : public Module::IManager
     SINGLETON_CLASS(ModuleManager)
 
 public:
-    void RegisterModule(std::shared_ptr<Module::IModule> module) override;
+    void RegisterModule(Module::IModule* module) override;
     void UnregisterAll() override;
 
 private:
-    std::stack<std::shared_ptr<Module::IModule>> mModules;
+    std::stack<Module::IModule*> mModules;
 };
 
 #endif  // WORKENGINE_MODULEMANAGER_H

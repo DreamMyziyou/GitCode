@@ -5,7 +5,9 @@
 #ifndef WORKENGINE_COMMONMODULE_H
 #define WORKENGINE_COMMONMODULE_H
 
-class CommonModule
+#include "CommonExport.h"
+
+class COMMON_API CommonModule
 {
 };
 

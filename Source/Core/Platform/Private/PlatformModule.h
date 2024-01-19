@@ -5,7 +5,9 @@
 #ifndef GITWORKSPACE_PLATFORMMODULE_H
 #define GITWORKSPACE_PLATFORMMODULE_H
 
-class PlatformModule
+#include "PlatformExport.h"
+
+class PLATFORM_API PlatformModule
 {
 };
 

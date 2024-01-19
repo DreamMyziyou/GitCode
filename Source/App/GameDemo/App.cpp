@@ -8,14 +8,8 @@
 
 using namespace std;
 
-class TestModule01 : public Module::IModule
-{
-    SINGLETON_MODULE(TestModule01)
-};
-
 void App::Start()
 {
-    TestModule01::instance();
 }
 
 void App::Run() {}

@@ -5,10 +5,6 @@
 #ifndef WORKENGINE_IMODULE_H
 #define WORKENGINE_IMODULE_H
 
-#include <memory>
-#include <vector>
-
-#include "BasicType/String.h"
 #include "ModuleExport.h"
 
 namespace Module
@@ -24,7 +20,7 @@ struct IModule
 struct IManager
 {
     virtual ~IManager() = default;
-    virtual void RegisterModule(std::shared_ptr<IModule> module) = 0;
+    virtual void RegisterModule(Module::IModule* module) = 0;
     virtual void UnregisterAll() = 0;
 };
 

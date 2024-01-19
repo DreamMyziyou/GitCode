@@ -5,7 +5,9 @@
 #ifndef WORKENGINE_COREMODULE_H
 #define WORKENGINE_COREMODULE_H
 
-class CoreModule
+#include "CoreExport.h"
+
+class CORE_API CoreModule
 {
 };
 

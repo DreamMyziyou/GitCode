@@ -4,7 +4,7 @@
 
 #include "ModuleManager.h"
 
-void ModuleManager::RegisterModule(std::shared_ptr<Module::IModule> module)
+void ModuleManager::RegisterModule(Module::IModule* module)
 {
     if (!module)
         return;

@@ -9,27 +9,24 @@
 
 #include "IModule.h"
 
-#define SINGLETON_MODULE(CLASS_NAME)                            \
-public:                                                        \
-    CLASS_NAME() = default;                                     \
-    ~CLASS_NAME() = default;                                    \
-    CLASS_NAME(const CLASS_NAME&) = delete;                     \
-    CLASS_NAME& operator=(const CLASS_NAME&) = delete;          \
-                                                                \
-public:                                                         \
-    static std::shared_ptr<CLASS_NAME> instance()               \
-    {                                                           \
-        struct Impl                                             \
-        {                                                       \
-            std::shared_ptr<CLASS_NAME> instance;               \
-            Impl()                                              \
-            {                                                   \
-                instance = std::make_shared<CLASS_NAME>();      \
-                Module::GetManager()->RegisterModule(instance); \
-            }                                                   \
-        };                                                      \
-        static Impl instance;                                   \
-        return instance.instance;                               \
+#define SINGLETON_MODULE(CLASS_NAME)                             \
+public:                                                          \
+    CLASS_NAME() = default;                                      \
+    ~CLASS_NAME() = default;                                     \
+    CLASS_NAME(const CLASS_NAME&) = delete;                      \
+    CLASS_NAME& operator=(const CLASS_NAME&) = delete;           \
+    static CLASS_NAME* instance()                                \
+    {                                                            \
+        struct Impl                                              \
+        {                                                        \
+            CLASS_NAME instance{};                               \
+            Impl()                                               \
+            {                                                    \
+                Module::GetManager()->RegisterModule(&instance); \
+            }                                                    \
+        };                                                       \
+        static Impl instance;                                    \
+        return &(instance.instance);                             \
     }
 
 #endif  // WORKENGINE_MODULESINGLETON_H
