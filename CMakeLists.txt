@@ -5,7 +5,7 @@ project(WorkEngine)
 include(CmakeUtils/ModuleFunction.cmake)
 
 set(BOOST_ROOT "D:/boost")
-find_package(Boost 1.84.0 REQUIRED)
+find_package(Boost 1.84.0 COMPONENTS log REQUIRED)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

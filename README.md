@@ -10,7 +10,6 @@
 
 ## TODO
 
-+ Logger
 + SignalCenter
 + ECS
 + 2D Geometry
