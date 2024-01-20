@@ -6,7 +6,6 @@
 
 #include <boost/log/core.hpp>
 #include <boost/log/sinks/sync_frontend.hpp>
-#include <boost/log/sinks/text_ostream_backend.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/trivial.hpp>
@@ -23,12 +22,6 @@ struct LoggerModule::Impl
 
 LoggerModule::LoggerModule()
 {
-    // log output to file
-    // add_file_log("Logger.log");
-
-    // filter level
-    // core::get()->set_filter(trivial::severity >= trivial::info);
-
     mImpl = new LoggerModule::Impl();
 }
 
