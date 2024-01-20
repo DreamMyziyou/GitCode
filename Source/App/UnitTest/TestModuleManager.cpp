@@ -56,4 +56,5 @@ public:
 TEST(ModuleManager, Register)
 {
     TestModule04::instance()->Get0203();
+    Module::GetManager()->UnregisterAll();
 }

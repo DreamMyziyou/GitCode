@@ -8,6 +8,7 @@
 #include <stack>
 
 #include "Common/ClassMacro.h"
+#include "BasicType/String.h"
 #include "IModule.h"
 
 class ModuleManager final : public Module::IManager
@@ -17,6 +18,9 @@ class ModuleManager final : public Module::IManager
 public:
     void RegisterModule(Module::IModule* module) override;
     void UnregisterAll() override;
+
+private:
+    static String GetModuleName(Module::IModule* module);
 
 private:
     std::stack<Module::IModule*> mModules;

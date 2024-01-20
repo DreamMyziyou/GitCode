@@ -1,4 +1,4 @@
 set(MODULE_NAME Logger)
 make_shared_module(${MODULE_NAME} .)
 target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(${MODULE_NAME} PUBLIC Module Boost::log)
+target_link_libraries(${MODULE_NAME} PUBLIC BasicType Boost::log)

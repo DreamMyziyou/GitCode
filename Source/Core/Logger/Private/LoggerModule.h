@@ -5,19 +5,19 @@
 #ifndef WORKENGINE_LOGGERMODULE_H
 #define WORKENGINE_LOGGERMODULE_H
 
+#include "Common/ClassMacro.h"
 #include "Logger.h"
-#include "Module/ModuleSingleton.h"
 
-class LoggerModule final : public Module::IModule
+class LoggerModule final
 {
-    SINGLETON_MODULE(LoggerModule)
-
-public:
-    void StartupModule() override;
-    void ShutdownModule() override;
+    SINGLETON_CLASS_CUSTOM_CONSTRUCT(LoggerModule)
 
 public:
     void Log(Logger::Level level, const String& module, const String& message);
+
+private:
+    struct Impl;
+    Impl* mImpl = nullptr;
 };
 
 #endif  // WORKENGINE_LOGGERMODULE_H

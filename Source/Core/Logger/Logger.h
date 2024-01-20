@@ -13,9 +13,9 @@ namespace Logger
 {
     enum class Level : uint8
     {
-        Info,
-        Debug,
         Trace,
+        Debug,
+        Info,
         Warning,
         Error,
         Fatal,

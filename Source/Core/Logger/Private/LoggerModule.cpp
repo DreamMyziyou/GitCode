@@ -4,43 +4,60 @@
 
 #include "LoggerModule.h"
 
-#include "boost/log/core.hpp"
-#include "boost/log/trivial.hpp"
+#include <boost/log/core.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+#include <boost/log/sources/logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/trivial.hpp>
+
+#include "Common/DeleteMacro.h"
 
 using namespace std;
-using namespace Logger;
+using namespace boost::log;
 
-void LoggerModule::StartupModule()
+struct LoggerModule::Impl
 {
-    IModule::StartupModule();
+    sources::severity_logger_mt<boost::log::trivial::severity_level> logger;
+};
+
+LoggerModule::LoggerModule()
+{
+    // log output to file
+    // add_file_log("Logger.log");
+
+    // filter level
+    // core::get()->set_filter(trivial::severity >= trivial::info);
+
+    mImpl = new LoggerModule::Impl();
 }
 
-void LoggerModule::ShutdownModule()
+LoggerModule::~LoggerModule()
 {
-    IModule::ShutdownModule();
+    SAFE_DELETE(mImpl);
 }
 
 void LoggerModule::Log(Logger::Level level, const String& module, const String& message)
 {
     switch (level)
     {
-        case Level::Info:
-            BOOST_LOG_TRIVIAL(info) << "[" << module << "]" << message;
+        case Logger::Level::Trace:
+            BOOST_LOG_SEV(mImpl->logger, trivial::trace) << "[" << module << "] " << message;
             break;
-        case Level::Debug:
-            BOOST_LOG_TRIVIAL(debug) << "[" << module << "]" << message;
+        case Logger::Level::Debug:
+            BOOST_LOG_SEV(mImpl->logger, trivial::debug) << "[" << module << "] " << message;
             break;
-        case Level::Trace:
-            BOOST_LOG_TRIVIAL(trace) << "[" << module << "]" << message;
+        case Logger::Level::Info:
+            BOOST_LOG_SEV(mImpl->logger, trivial::info) << "[" << module << "] " << message;
             break;
-        case Level::Warning:
-            BOOST_LOG_TRIVIAL(warning) << "[" << module << "]" << message;
+        case Logger::Level::Warning:
+            BOOST_LOG_SEV(mImpl->logger, trivial::warning) << "[" << module << "] " << message;
             break;
-        case Level::Error:
-            BOOST_LOG_TRIVIAL(error) << "[" << module << "]" << message;
+        case Logger::Level::Error:
+            BOOST_LOG_SEV(mImpl->logger, trivial::error) << "[" << module << "] " << message;
             break;
-        case Level::Fatal:
-            BOOST_LOG_TRIVIAL(fatal) << "[" << module << "]" << message;
+        case Logger::Level::Fatal:
+            BOOST_LOG_SEV(mImpl->logger, trivial::fatal) << "[" << module << "] " << message;
             break;
         default:
             break;
