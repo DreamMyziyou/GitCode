@@ -7,9 +7,9 @@
 
 #include <stack>
 
-#include "Common/ClassMacro.h"
 #include "BasicType/String.h"
-#include "IModule.h"
+#include "Common/ClassMacro.h"
+#include "Module.h"
 
 class ModuleManager final : public Module::IManager
 {

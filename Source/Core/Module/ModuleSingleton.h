@@ -5,9 +5,7 @@
 #ifndef WORKENGINE_MODULESINGLETON_H
 #define WORKENGINE_MODULESINGLETON_H
 
-#include <memory>
-
-#include "IModule.h"
+#include "Module.h"
 
 #define SINGLETON_MODULE(CLASS_NAME)                             \
 public:                                                          \
