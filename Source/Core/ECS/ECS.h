@@ -5,8 +5,9 @@
 #ifndef WORKENGINE_ECS_H
 #define WORKENGINE_ECS_H
 
-#include "ECSExport.h"
 #include <entt/entity/registry.hpp>
+
+#include "ECSExport.h"
 
 namespace ECS
 {
@@ -14,6 +15,6 @@ namespace ECS
 
     ECS_API World* GetWorld();
 
-};  // namespace ECS
+}  // namespace ECS
 
 #endif  // WORKENGINE_ECS_H
