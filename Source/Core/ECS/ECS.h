@@ -10,7 +10,7 @@
 
 namespace ECS
 {
-    using World = entt::registry;
+    using World = ::entt::registry;
 
     ECS_API World* GetWorld();
 
