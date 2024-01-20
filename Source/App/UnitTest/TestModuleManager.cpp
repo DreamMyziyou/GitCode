@@ -2,7 +2,8 @@
 // Created by WeslyChen on 2024/1/19.
 //
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "Module/ModuleSingleton.h"
 
 static int gStackCount = 0;

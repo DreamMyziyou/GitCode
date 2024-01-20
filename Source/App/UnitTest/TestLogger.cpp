@@ -2,11 +2,14 @@
 // Created by WeslyChen on 2024/1/19.
 //
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+
 #include "Logger/Logger.h"
 
 TEST(Logger, output)
 {
+    Logger::EnableLogger();
+
     Logger::LogInfo("LogInfo");
     Logger::Log(Logger::Level::Info, "LoggerTest", "Test Log Info.");
     Logger::Log(Logger::Level::Debug, "LoggerTest", "Test Log Debug.");
@@ -15,4 +18,6 @@ TEST(Logger, output)
     Logger::Log(Logger::Level::Error, "LoggerTest", "Test Log Error.");
     Logger::Log(Logger::Level::Fatal, "LoggerTest", "Test Log Fatal.");
     EXPECT_TRUE(true);
+
+    Logger::DisableLogger();
 }

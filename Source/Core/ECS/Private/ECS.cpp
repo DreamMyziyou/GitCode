@@ -3,3 +3,10 @@
 //
 
 #include "ECS.h"
+
+#include "WorldManager.h"
+
+ECS::World* ECS::GetWorld()
+{
+    return WorldManager::instance()->GetWorldRef();
+}

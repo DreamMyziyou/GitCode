@@ -6,13 +6,14 @@
 #define WORKENGINE_ECS_H
 
 #include "ECSExport.h"
+#include <entt/entity/registry.hpp>
 
 namespace ECS
 {
-    struct IWorld
-    {
-        virtual ~IWorld() {}
-    };
+    using World = entt::registry;
+
+    ECS_API World* GetWorld();
+
 };  // namespace ECS
 
 #endif  // WORKENGINE_ECS_H

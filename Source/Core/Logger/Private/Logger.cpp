@@ -6,6 +6,16 @@
 
 #include "LoggerModule.h"
 
+void Logger::EnableLogger()
+{
+    LoggerModule::instance()->SetEnabled(true);
+}
+
+void Logger::DisableLogger()
+{
+    LoggerModule::instance()->SetEnabled(false);
+}
+
 void Logger::Log(Logger::Level level, const String& module, const String& message)
 {
     LoggerModule::instance()->Log(level, module, message);

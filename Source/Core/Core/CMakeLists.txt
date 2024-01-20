@@ -6,4 +6,4 @@ target_link_libraries(${MODULE_NAME} PUBLIC
         Platform
         Logger
         Module
-)
+        ECS)

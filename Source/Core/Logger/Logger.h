@@ -24,6 +24,9 @@ namespace Logger
 
     constexpr const char* DEFAULT_MODULE_NAME = "Global";
 
+    LOGGER_API void EnableLogger();
+    LOGGER_API void DisableLogger();
+
     LOGGER_API void Log(Level level, const String& module, const String& message);
     LOGGER_API void LogInfo(const String& module, const String& message);
     LOGGER_API void LogInfo(const String& message);

@@ -32,6 +32,9 @@ LoggerModule::~LoggerModule()
 
 void LoggerModule::Log(Logger::Level level, const String& module, const String& message)
 {
+    if (!mIsEnabled)
+        return;
+
     switch (level)
     {
         case Logger::Level::Trace:
