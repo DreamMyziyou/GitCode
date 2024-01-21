@@ -7,5 +7,8 @@
 
 #include "Core/BasicType/BasicType.h"
 #include "Core/BasicType/String.h"
+#include "Core/Common/ClassMacro.h"
+#include "Core/Common/DeleteMacro.h"
+#include "Module/Logger/Logger.h"
 
 #endif  // WORKENGINE_ENGINECORE_H

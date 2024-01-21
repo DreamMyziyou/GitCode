@@ -4,7 +4,7 @@
 
 #include "VulkanManager.h"
 
-#include "GlfwWindow.h"
+#include "VulkanManagerImpl.h"
 
 using namespace std;
 
@@ -12,13 +12,18 @@ void VulkanManager::StartupModule()
 {
     IModule::StartupModule();
 
-    glfwInit();
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    mImpl = new VulkanManagerImpl();
+
+    mImpl->InitGlfw();
+    mImpl->InitVulkan();
 }
 
 void VulkanManager::ShutdownModule()
 {
-    glfwTerminate();
+    mImpl->UninitVulkan();
+    mImpl->UninitGlfw();
+
+    SAFE_DELETE(mImpl);
 
     IModule::ShutdownModule();
 }

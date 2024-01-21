@@ -14,7 +14,7 @@ GlfwWindow::~GlfwWindow()
     {
         glfwDestroyWindow(mWindow);
         mWindow = nullptr;
-        Logger::Log(Logger::Level::Info, "Window", "Destroy GlfwWindow.");
+        Logger::Log(Logger::Level::Info, "VulkanRender", "Destroy GlfwWindow.");
     }
 }
 
@@ -34,7 +34,7 @@ void GlfwWindow::Create()
     if (mWindow)
         return;
 
-    Logger::Log(Logger::Level::Info, "Window", "Create GlfwWindow.");
+    Logger::Log(Logger::Level::Info, "VulkanRender", "Create GlfwWindow.");
     mWindow = glfwCreateWindow(mWidth, mHeight, mWindowName.c_str(), nullptr, nullptr);
 }
 

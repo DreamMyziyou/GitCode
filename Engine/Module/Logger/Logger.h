@@ -29,8 +29,11 @@ namespace Logger
     LOGGER_API void DisableLogger();
 
     LOGGER_API void Log(Level level, const String& module, const String& message);
+
     LOGGER_API void LogInfo(const String& module, const String& message);
     LOGGER_API void LogInfo(const String& message);
+
+    LOGGER_API void LogFatal(const String& module, const String& message);
 
 }  // namespace Logger
 

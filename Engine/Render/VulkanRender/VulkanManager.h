@@ -11,6 +11,7 @@
 #include "Render/RenderInterface/IWindow.h"
 #include "VulkanRender.h"
 
+class VulkanManagerImpl;
 class VULKANRENDER_API VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager
 {
     SINGLETON_MODULE(VulkanManager)
@@ -21,6 +22,9 @@ public:
 
 public:
     std::shared_ptr<Render::IWindow> CreateGlfwWindow();
+
+private:
+    VulkanManagerImpl* mImpl = nullptr;
 };
 
 #endif  // WORKENGINE_VULKANMANAGER_H
