@@ -36,6 +36,11 @@ void Logger::LogInfo(const String& message)
     LoggerModule::instance()->Log(Logger::Level::Info, Logger::DEFAULT_MODULE_NAME, message);
 }
 
+void Logger::LogError(const String& module, const String& message)
+{
+    LoggerModule::instance()->Log(Logger::Level::Error, module, message);
+}
+
 void Logger::LogFatal(const String& module, const String& message)
 {
     LoggerModule::instance()->Log(Logger::Level::Fatal, module, message);

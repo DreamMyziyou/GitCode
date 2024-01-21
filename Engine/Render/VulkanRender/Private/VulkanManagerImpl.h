@@ -11,15 +11,25 @@ class VulkanManagerImpl
 {
     friend class VulkanManager;
 
+    // VulkanManager call
     void InitGlfw();
     void UninitGlfw();
     void InitVulkan();
     void UninitVulkan();
 
-    void CheckVulkanExtension() const;
+    // check
+    void CheckInstanceExtension() const;
+    bool CheckValidationLayer() const;
+
+    // build
+    void BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo);
+    void BuildDebugMessenger();
 
     VkResult mInitResult = VkResult::VK_SUCCESS;
     VkInstance mInstance = nullptr;
+
+    bool mApplyVaildationLayer = false;
+    VkDebugUtilsMessengerEXT mDebugMessenger;
 };
 
 #endif  // WORKENGINE_VULKANMANAGERIMPL_H
