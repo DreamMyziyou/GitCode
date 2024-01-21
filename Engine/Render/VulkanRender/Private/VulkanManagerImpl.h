@@ -5,7 +5,8 @@
 #ifndef WORKENGINE_VULKANMANAGERIMPL_H
 #define WORKENGINE_VULKANMANAGERIMPL_H
 
-#include "GlfwWindow.h"
+#include "VulkanInstanceWrapper.h"
+#include "VulkanDeviceWrapper.h"
 
 class VulkanManagerImpl
 {
@@ -17,19 +18,8 @@ class VulkanManagerImpl
     void InitVulkan();
     void UninitVulkan();
 
-    // check
-    void CheckInstanceExtension() const;
-    bool CheckValidationLayer() const;
-
-    // build
-    void BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo);
-    void BuildDebugMessenger();
-
-    VkResult mInitResult = VkResult::VK_SUCCESS;
-    VkInstance mInstance = nullptr;
-
-    bool mApplyVaildationLayer = false;
-    VkDebugUtilsMessengerEXT mDebugMessenger;
+    VulkanInstanceWrapper mInstance;
+    VulkanDeviceWrapper mDevice;
 };
 
 #endif  // WORKENGINE_VULKANMANAGERIMPL_H

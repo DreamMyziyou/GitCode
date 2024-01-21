@@ -4,6 +4,7 @@
 
 #include "VulkanManager.h"
 
+#include "GlfwWindow.h"
 #include "VulkanManagerImpl.h"
 
 using namespace std;

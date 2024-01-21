@@ -5,10 +5,8 @@
 #ifndef WORKENGINE_GLFWWINDOW_H
 #define WORKENGINE_GLFWWINDOW_H
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include "Render/RenderInterface/IWindow.h"
+#include "VulkanHelper.h"
 
 class GlfwWindow final : public Render::IWindow
 {

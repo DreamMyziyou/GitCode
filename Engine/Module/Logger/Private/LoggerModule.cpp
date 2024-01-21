@@ -38,22 +38,22 @@ void LoggerModule::Log(Logger::Level level, const String& module, const String& 
     switch (level)
     {
         case Logger::Level::Trace:
-            BOOST_LOG_SEV(mImpl->logger, trivial::trace) << "[" << module << "] \n" << message;
+            BOOST_LOG_SEV(mImpl->logger, trivial::trace) << "[" << module << "] \n" << message << '\n';
             break;
         case Logger::Level::Debug:
-            BOOST_LOG_SEV(mImpl->logger, trivial::debug) << "[" << module << "]\n " << message;
+            BOOST_LOG_SEV(mImpl->logger, trivial::debug) << "[" << module << "] \n" << message << '\n';
             break;
         case Logger::Level::Info:
-            BOOST_LOG_SEV(mImpl->logger, trivial::info) << "[" << module << "] \n" << message;
+            BOOST_LOG_SEV(mImpl->logger, trivial::info) << "[" << module << "] \n" << message << '\n';
             break;
         case Logger::Level::Warning:
-            BOOST_LOG_SEV(mImpl->logger, trivial::warning) << "[" << module << "]\n " << message;
+            BOOST_LOG_SEV(mImpl->logger, trivial::warning) << "[" << module << "] \n" << message << '\n';
             break;
         case Logger::Level::Error:
-            BOOST_LOG_SEV(mImpl->logger, trivial::error) << "[" << module << "] \n" << message;
+            BOOST_LOG_SEV(mImpl->logger, trivial::error) << "[" << module << "] \n" << message << '\n';
             break;
         case Logger::Level::Fatal:
-            BOOST_LOG_SEV(mImpl->logger, trivial::fatal) << "[" << module << "] \n" << message;
+            BOOST_LOG_SEV(mImpl->logger, trivial::fatal) << "[" << module << "] \n" << message << '\n';
             break;
         default:
             break;
