@@ -6,7 +6,3 @@
 # output
 /out
 /cmake-build-debug
-
-# third party
-/ThirdParty/googletest
-/ThirdParty/boost

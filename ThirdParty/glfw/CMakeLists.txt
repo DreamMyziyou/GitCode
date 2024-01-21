@@ -1,5 +1,0 @@
-set(MODULE_NAME glfw)
-add_library(${MODULE_NAME} SHARED IMPORTED GLOBAL)
-target_include_directories(${MODULE_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-set_target_properties(${MODULE_NAME} PROPERTIES IMPORTED_IMPLIB ${CMAKE_CURRENT_LIST_DIR}/lib-vc2022/glfw3dll.lib)
-set_target_properties(${MODULE_NAME} PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_LIST_DIR}/lib-vc2022/glfw3.dll)
