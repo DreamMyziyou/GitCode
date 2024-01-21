@@ -14,6 +14,7 @@ namespace Engine
     };
 
     ENGINE_API IEngine* GetEngine();
+
 }  // namespace Engine
 
 #endif  // WORKENGINE_ENGINE_H

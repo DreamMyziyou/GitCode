@@ -5,13 +5,13 @@
 #include "Application.h"
 
 #include "Core/Common/DeleteMacro.h"
-#include "UI/Window/WindowInterface.h"
+#include "Render/RenderManager/RenderManager.h"
 
 using namespace std;
 
 struct Application::Impl
 {
-    shared_ptr<WindowInterface::IWindow> window = nullptr;
+    shared_ptr<Render::IWindow> window = nullptr;
 };
 
 Application::Application()
@@ -28,7 +28,7 @@ void Application::Start()
 {
     Stop();
 
-    mImpl->window = WindowInterface::GetManager()->CreateWindow();
+    mImpl->window = RenderManager::GetManager()->CreateWindow();
 }
 
 void Application::Run()
