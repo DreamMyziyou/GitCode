@@ -2,9 +2,9 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#include "VulkanInstanceWrapper.h"
-
 #include <vector>
+
+#include "InstanceWrapper.h"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
-void VulkanInstanceWrapper::InitVulkanInstance()
+void InstanceWrapper::InitVulkanInstance()
 {
     // app info
     VkApplicationInfo appInfo{};
@@ -88,7 +88,7 @@ void VulkanInstanceWrapper::InitVulkanInstance()
     CheckInstanceExtension();
 }
 
-void VulkanInstanceWrapper::UninitVulkanInstance()
+void InstanceWrapper::UninitVulkanInstance()
 {
     if (!mInstance)
         return;
@@ -105,7 +105,7 @@ void VulkanInstanceWrapper::UninitVulkanInstance()
     Logger::LogInfo("VulkanRender", "Uninit Vulkan.");
 }
 
-void VulkanInstanceWrapper::CheckInstanceExtension() const
+void InstanceWrapper::CheckInstanceExtension() const
 {
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -122,7 +122,7 @@ void VulkanInstanceWrapper::CheckInstanceExtension() const
     Logger::LogInfo("VulkanRender", logMsg);
 }
 
-bool VulkanInstanceWrapper::CheckValidationLayer() const
+bool InstanceWrapper::CheckValidationLayer() const
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -150,7 +150,7 @@ bool VulkanInstanceWrapper::CheckValidationLayer() const
     return true;
 }
 
-void VulkanInstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)
+void InstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)
 {
     debugCreateInfo = {};
     debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -160,7 +160,7 @@ void VulkanInstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT&
     debugCreateInfo.pUserData = nullptr;  // Optional
 }
 
-void VulkanInstanceWrapper::BuildDebugMessenger()
+void InstanceWrapper::BuildDebugMessenger()
 {
     if (!mApplyVaildationLayer)
         return;

@@ -5,8 +5,8 @@
 #ifndef WORKENGINE_VULKANMANAGERIMPL_H
 #define WORKENGINE_VULKANMANAGERIMPL_H
 
-#include "VulkanInstanceWrapper.h"
-#include "VulkanDeviceWrapper.h"
+#include "DeviceWrapper.h"
+#include "InstanceWrapper.h"
 
 class VulkanManagerImpl
 {
@@ -18,8 +18,8 @@ class VulkanManagerImpl
     void InitVulkan();
     void UninitVulkan();
 
-    VulkanInstanceWrapper mInstance;
-    VulkanDeviceWrapper mDevice;
+    InstanceWrapper mInstance;
+    DeviceWrapper mDevice;
 };
 
 #endif  // WORKENGINE_VULKANMANAGERIMPL_H

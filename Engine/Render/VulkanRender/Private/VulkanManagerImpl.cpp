@@ -27,5 +27,6 @@ void VulkanManagerImpl::InitVulkan()
 
 void VulkanManagerImpl::UninitVulkan()
 {
+    mDevice.UninitDevice();
     mInstance.UninitVulkanInstance();
 }
