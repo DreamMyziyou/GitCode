@@ -1,0 +1,6 @@
+add_subdirectory(App)
+add_subdirectory(Core)
+add_subdirectory(Engine)
+add_subdirectory(Module)
+add_subdirectory(UI)
+add_subdirectory(UnitTest)

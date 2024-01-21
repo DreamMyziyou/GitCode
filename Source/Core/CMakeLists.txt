@@ -1,8 +1,0 @@
-add_subdirectory(BasicType)
-add_subdirectory(Common)
-add_subdirectory(Core)
-add_subdirectory(ECS)
-add_subdirectory(Logger)
-add_subdirectory(Module)
-add_subdirectory(Platform)
-add_subdirectory(SignalCenter)
