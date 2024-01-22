@@ -23,9 +23,26 @@ public:
     void UninitDevice();
 
 private:
+    bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
     bool IsDeviceSuitable(VkPhysicalDevice device) const;
     int32 ScoreDeviceSuitability(VkPhysicalDevice device) const;
+
+    struct QueueFamilyIndices
+    {
+        std::optional<uint32> graphicsFamily{};
+        std::optional<uint32> presentFamily{};
+
+        bool IsComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
+    };
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const;
+
+    struct SwapChainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
+    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
 
     void CreatePhysicalDevice();
     void CreateLogicDevice();
@@ -39,6 +56,7 @@ private:
     VkPhysicalDevice mPhysicalDevice = nullptr;
     VkDevice mLogicDevice = nullptr;
     VkQueue mGraphicsQueue = nullptr;
+    VkSwapchainKHR mSwapChain = nullptr;
 };
 
 #endif  // WORKENGINE_DEVICEWRAPPER_H

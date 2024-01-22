@@ -16,12 +16,4 @@
 
 #include "Engine/EngineCore.h"
 
-struct QueueFamilyIndices
-{
-    std::optional<uint32> graphicsFamily{};
-    std::optional<uint32> presentFamily{};
-
-    bool IsComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
-};
-
 #endif  // WORKENGINE_VULKANHELPER_H

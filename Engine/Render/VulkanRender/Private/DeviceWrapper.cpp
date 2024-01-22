@@ -12,6 +12,8 @@
 
 using namespace std;
 
+static const vector<const char*> gDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
 void DeviceWrapper::InitDevice(VkInstance instance, VkSurfaceKHR surface)
 {
     if (!instance || !surface)
@@ -32,6 +34,22 @@ void DeviceWrapper::UninitDevice()
     }
 }
 
+bool DeviceWrapper::CheckDeviceExtensionSupport(VkPhysicalDevice device) const
+{
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+    vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    set<String> requiredExtensions(gDeviceExtensions.begin(), gDeviceExtensions.end());
+
+    for (const auto& extension : availableExtensions)
+        requiredExtensions.erase(extension.extensionName);
+
+    return requiredExtensions.empty();
+}
+
 bool DeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
 {
     if (!device)
@@ -39,6 +57,16 @@ bool DeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
 
     QueueFamilyIndices indices = FindQueueFamilies(device);
     if (!indices.IsComplete())
+        return false;
+
+    bool extensionsSupported = CheckDeviceExtensionSupport(device);
+    if (!extensionsSupported)
+        return false;
+
+    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+    bool swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+
+    if (!swapChainAdequate)
         return false;
 
     return true;
@@ -71,14 +99,14 @@ int32 DeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
     return score;
 }
 
-QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDevice device) const
+DeviceWrapper::QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDevice device) const
 {
     QueueFamilyIndices indices;
 
     uint32 queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
     int32 i = 0;
@@ -101,6 +129,33 @@ QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDevice device) con
     return indices;
 }
 
+DeviceWrapper::SwapChainSupportDetails DeviceWrapper::QuerySwapChainSupport(VkPhysicalDevice device) const
+{
+    SwapChainSupportDetails details;
+
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mSurface, &details.capabilities);
+
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, nullptr);
+
+    if (formatCount != 0)
+    {
+        details.formats.resize(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, details.formats.data());
+    }
+
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, nullptr);
+
+    if (presentModeCount != 0)
+    {
+        details.presentModes.resize(presentModeCount);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, details.presentModes.data());
+    }
+
+    return details;
+}
+
 void DeviceWrapper::CreatePhysicalDevice()
 {
     // Get device
@@ -112,11 +167,11 @@ void DeviceWrapper::CreatePhysicalDevice()
     vkEnumeratePhysicalDevices(mInstance, &deviceCount, devices.data());
 
     // Use an ordered map to automatically sort candidates by increasing score
-    std::multimap<int32, VkPhysicalDevice> candidates;
+    multimap<int32, VkPhysicalDevice> candidates;
     for (const auto& device : devices)
     {
         int32 score = ScoreDeviceSuitability(device);
-        candidates.insert(std::make_pair(score, device));
+        candidates.insert(make_pair(score, device));
     }
 
     // Check if the best candidate is suitable at all
@@ -133,8 +188,8 @@ void DeviceWrapper::CreateLogicDevice()
 
     QueueFamilyIndices indices = FindQueueFamilies(mPhysicalDevice);
 
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+    vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     float queuePriority = 1.0f;
     for (uint32_t queueFamily : uniqueQueueFamilies)
@@ -154,6 +209,8 @@ void DeviceWrapper::CreateLogicDevice()
     createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
     createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.pEnabledFeatures = &deviceFeatures;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(gDeviceExtensions.size());
+    createInfo.ppEnabledExtensionNames = gDeviceExtensions.data();
 
     if (vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mLogicDevice) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "Failed to create logical device!");
