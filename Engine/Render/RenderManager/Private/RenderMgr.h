@@ -11,9 +11,6 @@
 class RenderMgr final : public ModuleCore::IModule, public RenderManager::IManager
 {
     SINGLETON_MODULE(RenderMgr)
-
-public:
-    std::shared_ptr<Render::IWindow> CreateWindow() override;
 };
 
 #endif  // WORKENGINE_RENDERMGR_H

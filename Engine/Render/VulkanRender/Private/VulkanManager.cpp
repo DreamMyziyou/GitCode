@@ -4,34 +4,26 @@
 
 #include "VulkanManager.h"
 
-#include "GlfwWindow.h"
 #include "VulkanManagerImpl.h"
 
 using namespace std;
 
 void VulkanManager::StartupModule()
 {
-    IModule::StartupModule();
-
     mImpl = new VulkanManagerImpl();
-
-    mImpl->InitGlfw();
-    mImpl->InitVulkan();
+    mImpl->InitGlfwVulkan();
 }
 
 void VulkanManager::ShutdownModule()
 {
-    mImpl->UninitVulkan();
-    mImpl->UninitGlfw();
-
+    mImpl->UninitGlfwVulkan();
     SAFE_DELETE(mImpl);
-
-    IModule::ShutdownModule();
 }
 
-std::shared_ptr<Render::IWindow> VulkanManager::CreateGlfwWindow()
+Render::IMainWindow* VulkanManager::GetMainWindow() const
 {
-    auto glfwWindow = make_shared<GlfwWindow>();
-    glfwWindow->Create();
-    return glfwWindow;
+    if (!mImpl)
+        return nullptr;
+
+    return &mImpl->mMainWindow;
 }

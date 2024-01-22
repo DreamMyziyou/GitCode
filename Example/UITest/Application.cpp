@@ -11,7 +11,7 @@ using namespace std;
 
 struct Application::Impl
 {
-    shared_ptr<Render::IWindow> window = nullptr;
+    Render::IMainWindow* mainWindow = nullptr;
 };
 
 Application::Application()
@@ -28,18 +28,19 @@ void Application::Start()
 {
     Stop();
 
-    mImpl->window = RenderManager::GetManager()->CreateWindow();
+    mImpl->mainWindow = RenderManager::GetMainWindow();
+    mImpl->mainWindow->Create();
 }
 
 void Application::Run()
 {
-    if (!mImpl->window)
+    if (!mImpl->mainWindow)
         return;
 
-    mImpl->window->Run();
+    mImpl->mainWindow->Run();
 }
 
 void Application::Stop()
 {
-    mImpl->window = nullptr;
+    mImpl->mainWindow = nullptr;
 }

@@ -8,11 +8,10 @@
 #include <memory>
 
 #include "Module/ModuleCore/ModuleSingleton.h"
-#include "Render/RenderInterface/IWindow.h"
 #include "VulkanRender.h"
 
 class VulkanManagerImpl;
-class VULKANRENDER_API VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager
+class VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager
 {
     SINGLETON_MODULE(VulkanManager)
 
@@ -21,7 +20,7 @@ public:
     void ShutdownModule() override;
 
 public:
-    std::shared_ptr<Render::IWindow> CreateGlfwWindow();
+    Render::IMainWindow* GetMainWindow() const;
 
 private:
     VulkanManagerImpl* mImpl = nullptr;

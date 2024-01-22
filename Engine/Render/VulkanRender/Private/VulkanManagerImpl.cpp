@@ -8,25 +8,13 @@
 
 using namespace std;
 
-void VulkanManagerImpl::InitGlfw()
+void VulkanManagerImpl::InitGlfwVulkan()
 {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 }
 
-void VulkanManagerImpl::UninitGlfw()
+void VulkanManagerImpl::UninitGlfwVulkan()
 {
     glfwTerminate();
-}
-
-void VulkanManagerImpl::InitVulkan()
-{
-    mInstance.InitVulkanInstance();
-    mDevice.InitDevice(mInstance.GetVulkanInstance());
-}
-
-void VulkanManagerImpl::UninitVulkan()
-{
-    mDevice.UninitDevice();
-    mInstance.UninitVulkanInstance();
 }

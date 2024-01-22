@@ -5,10 +5,13 @@
 #ifndef WORKENGINE_GLFWWINDOW_H
 #define WORKENGINE_GLFWWINDOW_H
 
+#include "Core/Common/ClassMacro.h"
+#include "DeviceWrapper.h"
+#include "InstanceWrapper.h"
 #include "Render/RenderInterface/IWindow.h"
 #include "VulkanHelper.h"
 
-class GlfwWindow final : public Render::IWindow
+class GlfwWindow final : public Render::IMainWindow
 {
 public:
     GlfwWindow();
@@ -23,10 +26,18 @@ public:
     void Run() override;
 
 private:
+    void InitWindow();
+    void InitSurface();
+    void Destroy();
+
+private:
     int32 mWidth = 800;
     int32 mHeight = 600;
     String mWindowName = "Window";
     GLFWwindow* mWindow = nullptr;
+    InstanceWrapper mInstance;
+    DeviceWrapper mDevice;
+    VkSurfaceKHR mSurface = nullptr;
 };
 
 #endif  // WORKENGINE_GLFWWINDOW_H

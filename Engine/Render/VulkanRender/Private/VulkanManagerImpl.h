@@ -5,21 +5,17 @@
 #ifndef WORKENGINE_VULKANMANAGERIMPL_H
 #define WORKENGINE_VULKANMANAGERIMPL_H
 
-#include "DeviceWrapper.h"
-#include "InstanceWrapper.h"
+#include "GlfwWindow.h"
 
 class VulkanManagerImpl
 {
     friend class VulkanManager;
 
     // VulkanManager call
-    void InitGlfw();
-    void UninitGlfw();
-    void InitVulkan();
-    void UninitVulkan();
+    void InitGlfwVulkan();
+    void UninitGlfwVulkan();
 
-    InstanceWrapper mInstance;
-    DeviceWrapper mDevice;
+    GlfwWindow mMainWindow;
 };
 
 #endif  // WORKENGINE_VULKANMANAGERIMPL_H

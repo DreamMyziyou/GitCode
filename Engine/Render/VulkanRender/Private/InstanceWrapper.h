@@ -23,7 +23,6 @@ public:
     void UninitVulkanInstance();
 
 private:
-
     // check
     void CheckInstanceExtension() const;
     bool CheckValidationLayer() const;
@@ -37,7 +36,7 @@ private:
     VkInstance mInstance = nullptr;
 
     bool mApplyVaildationLayer = false;
-    VkDebugUtilsMessengerEXT mDebugMessenger;
+    VkDebugUtilsMessengerEXT mDebugMessenger = nullptr;
 };
 
 #endif  // WORKENGINE_INSTANCEWRAPPER_H

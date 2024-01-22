@@ -19,6 +19,10 @@ namespace Render
         virtual void Run() = 0;
     };
 
+    struct IMainWindow : public IWindow
+    {
+    };
+
 }  // namespace Render
 
 #endif  // WORKENGINE_IWINDOW_H

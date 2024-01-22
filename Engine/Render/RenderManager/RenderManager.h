@@ -15,11 +15,10 @@ namespace RenderManager
     struct IManager
     {
         virtual ~IManager() {}
-
-        virtual std::shared_ptr<Render::IWindow> CreateWindow() = 0;
     };
 
     RENDERMANAGER_API IManager* GetManager();
+    RENDERMANAGER_API Render::IMainWindow* GetMainWindow();
 
 };  // namespace RenderManager
 

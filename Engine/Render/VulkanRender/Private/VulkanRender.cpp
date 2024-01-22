@@ -3,9 +3,15 @@
 //
 
 #include "VulkanRender.h"
+
 #include "VulkanManager.h"
 
 VulkanRender::IManager* VulkanRender::GetManager()
 {
     return VulkanManager::instance();
+}
+
+Render::IMainWindow* VulkanRender::GetMainWindow()
+{
+    return VulkanManager::instance()->GetMainWindow();
 }

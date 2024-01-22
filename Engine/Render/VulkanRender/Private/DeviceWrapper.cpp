@@ -5,17 +5,19 @@
 #include "DeviceWrapper.h"
 
 #include <map>
+#include <set>
 #include <vector>
 
 #include "Engine/EngineCore.h"
 
 using namespace std;
 
-void DeviceWrapper::InitDevice(VkInstance instance)
+void DeviceWrapper::InitDevice(VkInstance instance, VkSurfaceKHR surface)
 {
-    if (!instance)
+    if (!instance || !surface)
         return;
     mInstance = instance;
+    mSurface = surface;
 
     CreatePhysicalDevice();
     CreateLogicDevice();
@@ -30,13 +32,21 @@ void DeviceWrapper::UninitDevice()
     }
 }
 
-int32 DeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
+bool DeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
 {
     if (!device)
-        return 0;
+        return false;
 
     QueueFamilyIndices indices = FindQueueFamilies(device);
     if (!indices.IsComplete())
+        return false;
+
+    return true;
+}
+
+int32 DeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
+{
+    if (!IsDeviceSuitable(device))
         return 0;
 
     int32 score = 0;
@@ -79,6 +89,12 @@ QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDevice device) con
 
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
             indices.graphicsFamily = i;
+
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mSurface, &presentSupport);
+        if (presentSupport)
+            indices.presentFamily = i;
+
         i++;
     }
 
@@ -116,23 +132,31 @@ void DeviceWrapper::CreateLogicDevice()
         return;
 
     QueueFamilyIndices indices = FindQueueFamilies(mPhysicalDevice);
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
     float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    for (uint32_t queueFamily : uniqueQueueFamilies)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures{};
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.pEnabledFeatures = &deviceFeatures;
 
     if (vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mLogicDevice) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "Failed to create logical device!");
 
-    vkGetDeviceQueue(mLogicDevice, indices.graphicsFamily.value(), 0, &mGraphicsQueue);
+    vkGetDeviceQueue(mLogicDevice, indices.presentFamily.value(), 0, &mGraphicsQueue);
 }

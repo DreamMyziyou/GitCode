@@ -17,11 +17,13 @@ public:
 
 public:
     VkPhysicalDevice GetPhysicalDevice() const { return mPhysicalDevice; }
+    VkDevice GetLogicDevice() const { return mLogicDevice; }
 
-    void InitDevice(VkInstance instance);
+    void InitDevice(VkInstance instance, VkSurfaceKHR surface);
     void UninitDevice();
 
 private:
+    bool IsDeviceSuitable(VkPhysicalDevice device) const;
     int32 ScoreDeviceSuitability(VkPhysicalDevice device) const;
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const;
 
@@ -29,7 +31,11 @@ private:
     void CreateLogicDevice();
 
 private:
+    // input
     VkInstance mInstance = nullptr;
+    VkSurfaceKHR mSurface = nullptr;
+
+    // create
     VkPhysicalDevice mPhysicalDevice = nullptr;
     VkDevice mLogicDevice = nullptr;
     VkQueue mGraphicsQueue = nullptr;
