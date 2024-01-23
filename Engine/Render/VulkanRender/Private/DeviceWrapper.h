@@ -52,6 +52,7 @@ private:
     void CreatePhysicalDevice();
     void CreateLogicDevice();
     void CreateSwapChain();
+    void CreateImageViews();
 
 private:
     // input
@@ -68,6 +69,7 @@ private:
     std::vector<VkImage> mSwapChainImages;
     VkFormat mSwapChainImageFormat{};
     VkExtent2D mSwapChainExtent{};
+    std::vector<VkImageView> mSwapChainImageViews;
 };
 
 #endif  // WORKENGINE_DEVICEWRAPPER_H
