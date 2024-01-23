@@ -35,9 +35,9 @@ private:
     int32 mHeight = 600;
     String mWindowName = "Window";
     GLFWwindow* mWindow = nullptr;
+    VkSurfaceKHR mSurface = nullptr;
     InstanceWrapper mInstance;
     DeviceWrapper mDevice;
-    VkSurfaceKHR mSurface = nullptr;
 };
 
 #endif  // WORKENGINE_GLFWWINDOW_H

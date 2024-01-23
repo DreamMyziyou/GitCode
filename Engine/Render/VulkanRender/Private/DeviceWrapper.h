@@ -5,6 +5,8 @@
 #ifndef WORKENGINE_DEVICEWRAPPER_H
 #define WORKENGINE_DEVICEWRAPPER_H
 
+#include <vector>
+
 #include "VulkanHelper.h"
 
 class DeviceWrapper final
@@ -26,6 +28,9 @@ private:
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
     bool IsDeviceSuitable(VkPhysicalDevice device) const;
     int32 ScoreDeviceSuitability(VkPhysicalDevice device) const;
+    VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const;
+    VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const;
+    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
 
     struct QueueFamilyIndices
     {
@@ -46,17 +51,23 @@ private:
 
     void CreatePhysicalDevice();
     void CreateLogicDevice();
+    void CreateSwapChain();
 
 private:
     // input
     VkInstance mInstance = nullptr;
     VkSurfaceKHR mSurface = nullptr;
 
-    // create
+    // device
     VkPhysicalDevice mPhysicalDevice = nullptr;
     VkDevice mLogicDevice = nullptr;
     VkQueue mGraphicsQueue = nullptr;
+
+    // swap chain
     VkSwapchainKHR mSwapChain = nullptr;
+    std::vector<VkImage> mSwapChainImages;
+    VkFormat mSwapChainImageFormat{};
+    VkExtent2D mSwapChainExtent{};
 };
 
 #endif  // WORKENGINE_DEVICEWRAPPER_H
