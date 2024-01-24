@@ -18,8 +18,8 @@ namespace RenderManager
     };
 
     RENDERMANAGER_API IManager* GetManager();
-    RENDERMANAGER_API Render::IMainWindow* GetMainWindow();
+    RENDERMANAGER_API Render::IMainWindow* CreateMainWindow(int width, int height, String title);
 
-};  // namespace RenderManager
+}  // namespace RenderManager
 
 #endif  // WORKENGINE_RENDERMANAGER_H

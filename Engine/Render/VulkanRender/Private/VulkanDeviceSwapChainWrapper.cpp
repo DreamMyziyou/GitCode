@@ -2,7 +2,7 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#include "DeviceWrapper.h"
+#include "VulkanDeviceSwapChainWrapper.h"
 
 #include <algorithm>
 #include <limits>
@@ -11,17 +11,18 @@
 #include <vector>
 
 #include "Engine/EngineCore.h"
+#include "VulkanManager.h"
 
 using namespace std;
 
 static const vector<const char*> gDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-void DeviceWrapper::InitDevice(VkInstance instance, VkSurfaceKHR surface)
+void VulkanDeviceSwapChainWrapper::Create()
 {
-    if (!instance || !surface)
+    auto vulkanInstance = VulkanManager::instance()->GetVulkanInstance();
+    auto surface = VulkanManager::instance()->GetSurface();
+    if (!vulkanInstance || !surface)
         return;
-    mInstance = instance;
-    mSurface = surface;
 
     CreatePhysicalDevice();
     CreateLogicDevice();
@@ -29,7 +30,7 @@ void DeviceWrapper::InitDevice(VkInstance instance, VkSurfaceKHR surface)
     CreateImageViews();
 }
 
-void DeviceWrapper::UninitDevice()
+void VulkanDeviceSwapChainWrapper::Destroy()
 {
     if (!mLogicDevice)
         return;
@@ -45,7 +46,7 @@ void DeviceWrapper::UninitDevice()
     mLogicDevice = nullptr;
 }
 
-bool DeviceWrapper::CheckDeviceExtensionSupport(VkPhysicalDevice device) const
+bool VulkanDeviceSwapChainWrapper::CheckDeviceExtensionSupport(VkPhysicalDevice device) const
 {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -61,7 +62,7 @@ bool DeviceWrapper::CheckDeviceExtensionSupport(VkPhysicalDevice device) const
     return requiredExtensions.empty();
 }
 
-bool DeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
+bool VulkanDeviceSwapChainWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
 {
     if (!device)
         return false;
@@ -83,7 +84,7 @@ bool DeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
     return true;
 }
 
-int32 DeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
+int32 VulkanDeviceSwapChainWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
 {
     if (!IsDeviceSuitable(device))
         return 0;
@@ -110,7 +111,7 @@ int32 DeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
     return score;
 }
 
-VkSurfaceFormatKHR DeviceWrapper::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
+VkSurfaceFormatKHR VulkanDeviceSwapChainWrapper::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
 {
     for (const auto& availableFormat : availableFormats)
     {
@@ -121,7 +122,7 @@ VkSurfaceFormatKHR DeviceWrapper::ChooseSwapSurfaceFormat(const std::vector<VkSu
     return availableFormats[0];
 }
 
-VkPresentModeKHR DeviceWrapper::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
+VkPresentModeKHR VulkanDeviceSwapChainWrapper::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
 {
     for (const auto& availablePresentMode : availablePresentModes)
     {
@@ -132,13 +133,13 @@ VkPresentModeKHR DeviceWrapper::ChooseSwapPresentMode(const std::vector<VkPresen
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D DeviceWrapper::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
+VkExtent2D VulkanDeviceSwapChainWrapper::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
 {
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
         return capabilities.currentExtent;
 
     VkSurfaceCapabilitiesKHR surfaceCapabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, mSurface, &surfaceCapabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, VulkanManager::instance()->GetSurface(), &surfaceCapabilities);
 
     VkExtent2D actualExtent = surfaceCapabilities.currentExtent;
 
@@ -148,7 +149,7 @@ VkExtent2D DeviceWrapper::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capab
     return actualExtent;
 }
 
-DeviceWrapper::QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDevice device) const
+VulkanDeviceSwapChainWrapper::QueueFamilyIndices VulkanDeviceSwapChainWrapper::FindQueueFamilies(VkPhysicalDevice device) const
 {
     QueueFamilyIndices indices;
 
@@ -168,7 +169,7 @@ DeviceWrapper::QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDev
             indices.graphicsFamily = i;
 
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mSurface, &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, VulkanManager::instance()->GetSurface(), &presentSupport);
         if (presentSupport)
             indices.presentFamily = i;
 
@@ -178,42 +179,43 @@ DeviceWrapper::QueueFamilyIndices DeviceWrapper::FindQueueFamilies(VkPhysicalDev
     return indices;
 }
 
-DeviceWrapper::SwapChainSupportDetails DeviceWrapper::QuerySwapChainSupport(VkPhysicalDevice device) const
+VulkanDeviceSwapChainWrapper::SwapChainSupportDetails VulkanDeviceSwapChainWrapper::QuerySwapChainSupport(VkPhysicalDevice device) const
 {
     SwapChainSupportDetails details;
 
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mSurface, &details.capabilities);
+    auto surface = VulkanManager::instance()->GetSurface();
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
     uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, nullptr);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
 
     if (formatCount != 0)
     {
         details.formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, details.formats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
     }
 
     uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, nullptr);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
 
     if (presentModeCount != 0)
     {
         details.presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, details.presentModes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
     }
 
     return details;
 }
 
-void DeviceWrapper::CreatePhysicalDevice()
+void VulkanDeviceSwapChainWrapper::CreatePhysicalDevice()
 {
     // Get device
     uint32 deviceCount = 0;
-    vkEnumeratePhysicalDevices(mInstance, &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(VulkanManager::instance()->GetVulkanInstance(), &deviceCount, nullptr);
     if (deviceCount == 0)
         return Logger::LogFatal("VulkanRender", "Failed to find GPUs with Vulkan support!");
     vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(mInstance, &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(VulkanManager::instance()->GetVulkanInstance(), &deviceCount, devices.data());
 
     // Use an ordered map to automatically sort candidates by increasing score
     multimap<int32, VkPhysicalDevice> candidates;
@@ -230,7 +232,7 @@ void DeviceWrapper::CreatePhysicalDevice()
         return Logger::LogFatal("VulkanRender", "Failed to find a suitable GPU!");
 }
 
-void DeviceWrapper::CreateLogicDevice()
+void VulkanDeviceSwapChainWrapper::CreateLogicDevice()
 {
     if (!mPhysicalDevice)
         return;
@@ -267,7 +269,7 @@ void DeviceWrapper::CreateLogicDevice()
     vkGetDeviceQueue(mLogicDevice, indices.presentFamily.value(), 0, &mGraphicsQueue);
 }
 
-void DeviceWrapper::CreateSwapChain()
+void VulkanDeviceSwapChainWrapper::CreateSwapChain()
 {
     SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(mPhysicalDevice);
     VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -280,7 +282,7 @@ void DeviceWrapper::CreateSwapChain()
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = mSurface;
+    createInfo.surface = VulkanManager::instance()->GetSurface();
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -323,7 +325,7 @@ void DeviceWrapper::CreateSwapChain()
     mSwapChainExtent = extent;
 }
 
-void DeviceWrapper::CreateImageViews()
+void VulkanDeviceSwapChainWrapper::CreateImageViews()
 {
     if (mSwapChainImages.empty())
         return;

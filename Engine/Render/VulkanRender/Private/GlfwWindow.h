@@ -6,10 +6,10 @@
 #define WORKENGINE_GLFWWINDOW_H
 
 #include "Core/Common/ClassMacro.h"
-#include "DeviceWrapper.h"
-#include "InstanceWrapper.h"
 #include "Render/RenderInterface/IWindow.h"
-#include "VulkanHelper.h"
+#include "VulkanDeviceSwapChainWrapper.h"
+#include "VulkanInstanceWrapper.h"
+#include "VulkanResource.h"
 
 class GlfwWindow final : public Render::IMainWindow
 {
@@ -20,14 +20,14 @@ public:
     GlfwWindow& operator=(const GlfwWindow&) = delete;
 
 public:
-    void SetWH(int32 width, int32 height) override;
-    void SetWindowName(const String& name) override;
-    void Create() override;
     void Run() override;
 
-private:
-    void InitWindow();
-    void InitSurface();
+public:
+    GLFWwindow* GetWindow() const { return mWindow; }
+
+    void SetWH(int32 width, int32 height);
+    void SetWindowName(const String& name);
+    void Create();
     void Destroy();
 
 private:
@@ -35,9 +35,6 @@ private:
     int32 mHeight = 600;
     String mWindowName = "Window";
     GLFWwindow* mWindow = nullptr;
-    VkSurfaceKHR mSurface = nullptr;
-    InstanceWrapper mInstance;
-    DeviceWrapper mDevice;
 };
 
 #endif  // WORKENGINE_GLFWWINDOW_H

@@ -11,7 +11,7 @@ VulkanRender::IManager* VulkanRender::GetManager()
     return VulkanManager::instance();
 }
 
-Render::IMainWindow* VulkanRender::GetMainWindow()
+Render::IMainWindow* VulkanRender::CreateMainWindow(int width, int height, String title)
 {
-    return VulkanManager::instance()->GetMainWindow();
+    return VulkanManager::instance()->CreateMainWindow(width, height, title);
 }

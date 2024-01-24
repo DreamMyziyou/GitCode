@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_VULKANHELPER_H
-#define WORKENGINE_VULKANHELPER_H
+#ifndef WORKENGINE_VULKANRESOURCE_H
+#define WORKENGINE_VULKANRESOURCE_H
 
 #define NOMINMAX
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -17,4 +17,4 @@
 
 #include "Engine/EngineCore.h"
 
-#endif  // WORKENGINE_VULKANHELPER_H
+#endif  // WORKENGINE_VULKANRESOURCE_H

@@ -2,18 +2,18 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_INSTANCEWRAPPER_H
-#define WORKENGINE_INSTANCEWRAPPER_H
+#ifndef WORKENGINE_VULKANINSTANCEWRAPPER_H
+#define WORKENGINE_VULKANINSTANCEWRAPPER_H
 
-#include "VulkanHelper.h"
+#include "VulkanResource.h"
 
-class InstanceWrapper final
+class VulkanInstanceWrapper final
 {
 public:
-    InstanceWrapper() = default;
-    ~InstanceWrapper() = default;
-    InstanceWrapper(const InstanceWrapper&) = delete;
-    InstanceWrapper& operator=(const InstanceWrapper&) = delete;
+    VulkanInstanceWrapper() = default;
+    ~VulkanInstanceWrapper() = default;
+    VulkanInstanceWrapper(const VulkanInstanceWrapper&) = delete;
+    VulkanInstanceWrapper& operator=(const VulkanInstanceWrapper&) = delete;
 
 public:
     // get
@@ -35,8 +35,8 @@ private:
     VkResult mInitResult = VkResult::VK_SUCCESS;
     VkInstance mInstance = nullptr;
 
-    bool mApplyVaildationLayer = false;
+    bool mApplyValidationLayer = false;
     VkDebugUtilsMessengerEXT mDebugMessenger = nullptr;
 };
 
-#endif  // WORKENGINE_INSTANCEWRAPPER_H
+#endif  // WORKENGINE_VULKANINSTANCEWRAPPER_H

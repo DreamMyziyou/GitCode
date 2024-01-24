@@ -7,6 +7,6 @@
 
 #define SAFE_DELETE(ptr) \
     delete ptr;          \
-    ptr = nullptr;
+    ptr = nullptr
 
 #endif  // WORKENGINE_DELETEMACRO_H

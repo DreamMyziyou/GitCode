@@ -12,10 +12,8 @@ namespace Render
 
     struct IWindow
     {
-        virtual ~IWindow() {}
-        virtual void SetWH(int32 width, int32 height) = 0;
-        virtual void SetWindowName(const String& name) = 0;
-        virtual void Create() = 0;
+        virtual ~IWindow() = default;
+
         virtual void Run() = 0;
     };
 

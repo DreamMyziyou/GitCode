@@ -2,17 +2,17 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#include <vector>
+#include "VulkanInstanceWrapper.h"
 
-#include "InstanceWrapper.h"
+#include <vector>
 
 using namespace std;
 
 static const std::vector<const char*> gValidationLayers = {"VK_LAYER_KHRONOS_validation"};
 #ifdef NDEBUG
-constexpr bool ENABLE_VAILDATION_LAYERS = false;
+constexpr bool ENABLE_VALIDATION_LAYERS = false;
 #else
-constexpr bool ENABLE_VAILDATION_LAYERS = true;
+constexpr bool ENABLE_VALIDATION_LAYERS = true;
 #endif
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -24,7 +24,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
-void InstanceWrapper::InitVulkanInstance()
+void VulkanInstanceWrapper::InitVulkanInstance()
 {
     // app info
     VkApplicationInfo appInfo{};
@@ -42,10 +42,10 @@ void InstanceWrapper::InitVulkanInstance()
     createInfo.pApplicationInfo = &appInfo;
 
     // check whether apply validation layer
-    if (ENABLE_VAILDATION_LAYERS)
+    if (ENABLE_VALIDATION_LAYERS)
     {
         if (CheckValidationLayer())
-            mApplyVaildationLayer = true;
+            mApplyValidationLayer = true;
         else
             Logger::LogError("VulkanRender", "Validation layers requested, but not available!");
     }
@@ -54,13 +54,13 @@ void InstanceWrapper::InitVulkanInstance()
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-    if (mApplyVaildationLayer)
+    if (mApplyValidationLayer)
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     // set vaildation layer
-    if (mApplyVaildationLayer)
+    if (mApplyValidationLayer)
     {
         VkDebugUtilsMessengerCreateInfoEXT debugInfo;
         BuildDebugInfoTo(debugInfo);
@@ -81,19 +81,19 @@ void InstanceWrapper::InitVulkanInstance()
     else
         Logger::LogInfo("VulkanRender", "Init Vulkan success.");
 
-    // build debug messager
+    // build debug messenger
     BuildDebugMessenger();
 
     // check extension
     CheckInstanceExtension();
 }
 
-void InstanceWrapper::UninitVulkanInstance()
+void VulkanInstanceWrapper::UninitVulkanInstance()
 {
     if (!mInstance)
         return;
 
-    if (mApplyVaildationLayer)
+    if (mApplyValidationLayer)
     {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(mInstance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr)
@@ -105,7 +105,7 @@ void InstanceWrapper::UninitVulkanInstance()
     Logger::LogInfo("VulkanRender", "Uninit Vulkan.");
 }
 
-void InstanceWrapper::CheckInstanceExtension() const
+void VulkanInstanceWrapper::CheckInstanceExtension() const
 {
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -122,7 +122,7 @@ void InstanceWrapper::CheckInstanceExtension() const
     Logger::LogInfo("VulkanRender", logMsg);
 }
 
-bool InstanceWrapper::CheckValidationLayer() const
+bool VulkanInstanceWrapper::CheckValidationLayer() const
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -150,24 +150,26 @@ bool InstanceWrapper::CheckValidationLayer() const
     return true;
 }
 
-void InstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)
+void VulkanInstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)
 {
     debugCreateInfo = {};
     debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                  VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     debugCreateInfo.pfnUserCallback = DebugCallback;
     debugCreateInfo.pUserData = nullptr;  // Optional
 }
 
-void InstanceWrapper::BuildDebugMessenger()
+void VulkanInstanceWrapper::BuildDebugMessenger()
 {
-    if (!mApplyVaildationLayer)
+    if (!mApplyValidationLayer)
         return;
 
     VkDebugUtilsMessengerCreateInfoEXT debugInfo;
     BuildDebugInfoTo(debugInfo);
 
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT");
-    VkResult result = func(mInstance, &debugInfo, nullptr, &mDebugMessenger);
+    func(mInstance, &debugInfo, nullptr, &mDebugMessenger);
 }

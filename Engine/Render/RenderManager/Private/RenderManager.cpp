@@ -12,7 +12,7 @@ RenderManager::IManager* RenderManager::GetManager()
     return RenderMgr::instance();
 }
 
-Render::IMainWindow* RenderManager::GetMainWindow()
+Render::IMainWindow* RenderManager::CreateMainWindow(int width, int height, String title)
 {
-    return VulkanRender::GetMainWindow();
+    return VulkanRender::CreateMainWindow(width, height, title);
 }

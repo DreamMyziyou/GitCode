@@ -5,8 +5,8 @@
 #ifndef WORKENGINE_VULKANRENDER_H
 #define WORKENGINE_VULKANRENDER_H
 
-#include "VulkanRenderExport.h"
 #include "Render/RenderInterface/IWindow.h"
+#include "VulkanRenderExport.h"
 
 namespace VulkanRender
 {
@@ -16,7 +16,7 @@ namespace VulkanRender
     };
 
     VULKANRENDER_API IManager* GetManager();
-    VULKANRENDER_API Render::IMainWindow* GetMainWindow();
+    VULKANRENDER_API Render::IMainWindow* CreateMainWindow(int width, int height, String title);
 
 }  // namespace VulkanRender
 

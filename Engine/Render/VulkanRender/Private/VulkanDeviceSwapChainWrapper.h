@@ -2,27 +2,29 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_DEVICEWRAPPER_H
-#define WORKENGINE_DEVICEWRAPPER_H
+#ifndef WORKENGINE_VULKANDEVICESWAPCHAINWRAPPER_H
+#define WORKENGINE_VULKANDEVICESWAPCHAINWRAPPER_H
 
 #include <vector>
 
-#include "VulkanHelper.h"
+#include "VulkanResource.h"
 
-class DeviceWrapper final
+class VulkanDeviceSwapChainWrapper final
 {
 public:
-    DeviceWrapper() = default;
-    ~DeviceWrapper() = default;
-    DeviceWrapper(const DeviceWrapper&) = delete;
-    DeviceWrapper& operator=(const DeviceWrapper&) = delete;
+    VulkanDeviceSwapChainWrapper() = default;
+    ~VulkanDeviceSwapChainWrapper() = default;
+    VulkanDeviceSwapChainWrapper(const VulkanDeviceSwapChainWrapper&) = delete;
+    VulkanDeviceSwapChainWrapper& operator=(const VulkanDeviceSwapChainWrapper&) = delete;
 
 public:
     VkPhysicalDevice GetPhysicalDevice() const { return mPhysicalDevice; }
     VkDevice GetLogicDevice() const { return mLogicDevice; }
+    VkQueue GetGraphicsQueue() const { return mGraphicsQueue; }
+    VkSwapchainKHR GetSwapChain() const { return mSwapChain; }
 
-    void InitDevice(VkInstance instance, VkSurfaceKHR surface);
-    void UninitDevice();
+    void Create();
+    void Destroy();
 
 private:
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
@@ -55,10 +57,6 @@ private:
     void CreateImageViews();
 
 private:
-    // input
-    VkInstance mInstance = nullptr;
-    VkSurfaceKHR mSurface = nullptr;
-
     // device
     VkPhysicalDevice mPhysicalDevice = nullptr;
     VkDevice mLogicDevice = nullptr;
@@ -72,4 +70,4 @@ private:
     std::vector<VkImageView> mSwapChainImageViews;
 };
 
-#endif  // WORKENGINE_DEVICEWRAPPER_H
+#endif  // WORKENGINE_VULKANDEVICESWAPCHAINWRAPPER_H

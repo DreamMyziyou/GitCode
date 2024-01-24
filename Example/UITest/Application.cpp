@@ -28,8 +28,7 @@ void Application::Start()
 {
     Stop();
 
-    mImpl->mainWindow = RenderManager::GetMainWindow();
-    mImpl->mainWindow->Create();
+    mImpl->mainWindow = RenderManager::CreateMainWindow(800, 600, "ApplicationWindow");
 }
 
 void Application::Run()
