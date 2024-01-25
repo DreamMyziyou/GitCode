@@ -10,6 +10,8 @@ void VulkanManager::StartupModule() {}
 
 void VulkanManager::ShutdownModule()
 {
+    mSwapChain.Destroy();
+
     mDevice.Destroy();
 
     DestroySurface();
@@ -37,6 +39,8 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
     CreateSurface();
 
     mDevice.Create();
+
+    mSwapChain.Create();
 
     return &mMainWindow;
 }

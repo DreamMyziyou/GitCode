@@ -7,7 +7,7 @@
 
 #include "Core/Common/ClassMacro.h"
 #include "Render/RenderInterface/IWindow.h"
-#include "VulkanDeviceSwapChainWrapper.h"
+#include "VulkanDeviceWrapper.h"
 #include "VulkanInstanceWrapper.h"
 #include "VulkanResource.h"
 
