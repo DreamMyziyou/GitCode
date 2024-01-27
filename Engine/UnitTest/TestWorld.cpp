@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "Module/ECS/ECS.h"
+#include "World/World.h"
 
-TEST(ECS, World)
+TEST(World, ECS)
 {
     struct PositionComponent
     {
@@ -19,7 +19,7 @@ TEST(ECS, World)
         bool isMovable = false;
     };
 
-    auto world = ECS::GetWorld();
+    auto world = World::GetWorld();
     auto entity = world->create();
     world->emplace<PositionComponent>(entity, PositionComponent{1, 2});
     world->emplace<MoveComponent>(entity, MoveComponent{true});

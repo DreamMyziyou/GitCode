@@ -5,7 +5,7 @@
 #ifndef WORKENGINE_WORLDMANAGER_H
 #define WORKENGINE_WORLDMANAGER_H
 
-#include "ECS.h"
+#include "World.h"
 #include "Module/ModuleCore/ModuleSingleton.h"
 
 class WorldManager final : ModuleCore::IModule
@@ -13,10 +13,10 @@ class WorldManager final : ModuleCore::IModule
     SINGLETON_MODULE(WorldManager)
 
 public:
-    ECS::World* GetWorldRef() { return &mWorld; }
+    World::World* GetWorldRef() { return &mWorld; }
 
 private:
-    ECS::World mWorld;
+    World::World mWorld;
 };
 
 #endif  // WORKENGINE_WORLDMANAGER_H

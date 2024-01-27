@@ -2,11 +2,11 @@
 // Created by WeslyChen on 2024/1/20.
 //
 
-#include "ECS.h"
+#include "World.h"
 
 #include "WorldManager.h"
 
-ECS::World* ECS::GetWorld()
+World::World* World::GetWorld()
 {
     return WorldManager::instance()->GetWorldRef();
 }
