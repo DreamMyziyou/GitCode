@@ -13,11 +13,11 @@
 #include "Core/Common/DeleteMacro.h"
 
 using namespace std;
-using namespace boost::log;
+using namespace ::boost::log;
 
 struct LoggerModule::Impl
 {
-    sources::severity_logger_mt<boost::log::trivial::severity_level> logger;
+    sources::severity_logger_mt<trivial::severity_level> logger;
 };
 
 LoggerModule::LoggerModule()

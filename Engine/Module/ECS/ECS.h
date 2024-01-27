@@ -6,7 +6,7 @@
 #define WORKENGINE_ECS_H
 
 #include "ECSExport.h"
-#include <entt/src/entt/entity/registry.hpp>
+#include <entt/entity/registry.hpp>
 
 namespace ECS
 {

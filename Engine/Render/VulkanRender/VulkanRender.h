@@ -12,7 +12,7 @@ namespace VulkanRender
 {
     struct IManager
     {
-        virtual ~IManager() {}
+        virtual ~IManager() = default;
     };
 
     VULKANRENDER_API IManager* GetManager();
