@@ -12,6 +12,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -26,26 +27,12 @@ struct QueueFamilyIndices
 };
 extern QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
-struct SwapChainSupportDetails
-{
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
-};
-extern SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
-
 struct IVulkanResource
 {
     virtual ~IVulkanResource() = default;
 
-    virtual VkInstance GetVulkanInstance() const = 0;
-    virtual GLFWwindow* GetWindowHandle() const = 0;
-    virtual VkSurfaceKHR GetSurface() const = 0;
-    virtual VkPhysicalDevice GetPhysicalDevice() const = 0;
-    virtual VkDevice GetVulkanDevice() const = 0;
-    virtual VkQueue GetGraphicsQueue() const = 0;
-    virtual VkSwapchainKHR GetSwapChain() const = 0;
+    virtual void CreateResource() = 0;
+    virtual void DestroyResource() = 0;
 };
-extern IVulkanResource* GetVulkanResource();
 
 #endif  // WORKENGINE_VULKANRESOURCE_H

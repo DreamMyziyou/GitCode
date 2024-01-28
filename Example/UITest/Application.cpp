@@ -5,7 +5,9 @@
 #include "Application.h"
 
 #include "Core/Common/DeleteMacro.h"
+#include "Render/RenderInterface/RenderComponent.h"
 #include "Render/RenderManager/RenderManager.h"
+#include "World/World.h"
 
 using namespace std;
 
@@ -30,7 +32,12 @@ void Application::Start()
 
     mImpl->mainWindow = RenderManager::CreateMainWindow(800, 600, "ApplicationWindow");
 
-
+    auto world = World::GetWorld();
+    if (!world)
+        return;
+    auto object = world->create();
+    world->emplace<Render::MeshComponent>(object, Render::MeshComponent::Type::Default, "HelloTriangle");
+    world->emplace<Render::MaterialComponent>(object, "Base");
 }
 
 void Application::Run()

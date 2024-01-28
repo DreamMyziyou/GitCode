@@ -11,7 +11,7 @@
 #include "VulkanInstanceWrapper.h"
 #include "VulkanResource.h"
 
-class GlfwWindow final : public Render::IMainWindow
+class GlfwWindow final : public Render::IMainWindow, public IVulkanResource
 {
 public:
     GlfwWindow();
@@ -23,12 +23,20 @@ public:
     void Run() override;
 
 public:
+    void CreateResource() override;
+    void DestroyResource() override;
+
+public:
     GLFWwindow* GetWindow() const { return mWindow; }
 
     void SetWH(int32 width, int32 height);
     void SetWindowName(const String& name);
-    void Create();
-    void Destroy();
+
+private:
+    // temp for check world
+    void CheckUpdate();
+
+    void DrawCall();
 
 private:
     int32 mWidth = 800;

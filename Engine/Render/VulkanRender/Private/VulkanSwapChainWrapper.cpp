@@ -4,49 +4,50 @@
 
 #include "VulkanSwapChainWrapper.h"
 
-#include <algorithm>
-#include <limits>
+#include "VulkanManager.h"
 
 using namespace std;
 
-void VulkanSwapChainWrapper::Create()
+void VulkanSwapChainWrapper::CreateResource()
 {
     CreateSwapChain();
     CreateImageViews();
+    CreateFrameBuffers();
 }
 
-void VulkanSwapChainWrapper::Destroy()
+void VulkanSwapChainWrapper::DestroyResource()
 {
+    for (auto framebuffer : mSwapChainFrameBuffers)
+        vkDestroyFramebuffer(VulkanManager::instance()->GetVulkanDevice(), framebuffer, nullptr);
+    mSwapChainFrameBuffers.clear();
+
     for (auto imageView : mSwapChainImageViews)
-        vkDestroyImageView(GetVulkanResource()->GetVulkanDevice(), imageView, nullptr);
+        vkDestroyImageView(VulkanManager::instance()->GetVulkanDevice(), imageView, nullptr);
+    mSwapChainImageViews.clear();
 
     mSwapChainImages.clear();
-    vkDestroySwapchainKHR(GetVulkanResource()->GetVulkanDevice(), mSwapChain, nullptr);
+
+    vkDestroySwapchainKHR(VulkanManager::instance()->GetVulkanDevice(), mSwapChain, nullptr);
     mSwapChain = nullptr;
 }
 
 void VulkanSwapChainWrapper::CreateSwapChain()
 {
-    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(GetVulkanResource()->GetPhysicalDevice());
-    VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-    VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-    VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
-
-    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
-        imageCount = swapChainSupport.capabilities.maxImageCount;
+    auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
+    auto expectFormat = deviceWrapper->GetExpectSurfaceFormat();
+    auto expectBufferCount = deviceWrapper->GetExpectSwapChainBufferCount();
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = GetVulkanResource()->GetSurface();
-    createInfo.minImageCount = imageCount;
-    createInfo.imageFormat = surfaceFormat.format;
-    createInfo.imageColorSpace = surfaceFormat.colorSpace;
-    createInfo.imageExtent = extent;
+    createInfo.surface = VulkanManager::instance()->GetSurface();
+    createInfo.minImageCount = expectBufferCount;
+    createInfo.imageFormat = expectFormat.format;
+    createInfo.imageColorSpace = expectFormat.colorSpace;
+    createInfo.imageExtent = deviceWrapper->GetExpectSwapChainExtent();
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices indices = FindQueueFamilies(GetVulkanResource()->GetPhysicalDevice());
+    QueueFamilyIndices indices = FindQueueFamilies(VulkanManager::instance()->GetPhysicalDevice());
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     if (indices.graphicsFamily != indices.presentFamily)
@@ -62,23 +63,32 @@ void VulkanSwapChainWrapper::CreateSwapChain()
         createInfo.pQueueFamilyIndices = nullptr;  // Optional
     }
 
-    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+    createInfo.preTransform = deviceWrapper->GetSurfaceCapabilities().currentTransform;
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    createInfo.presentMode = presentMode;
+    createInfo.presentMode = deviceWrapper->GetExpectPresentMode();
     createInfo.clipped = VK_TRUE;
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     VkSwapchainKHR swapChain;
-    if (vkCreateSwapchainKHR(GetVulkanResource()->GetVulkanDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+    if (vkCreateSwapchainKHR(VulkanManager::instance()->GetVulkanDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "failed to create swap chain!");
 
     mSwapChain = swapChain;
 
-    vkGetSwapchainImagesKHR(GetVulkanResource()->GetVulkanDevice(), swapChain, &imageCount, nullptr);
-    mSwapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(GetVulkanResource()->GetVulkanDevice(), swapChain, &imageCount, mSwapChainImages.data());
-    mSwapChainImageFormat = surfaceFormat.format;
-    mSwapChainExtent = extent;
+    vkGetSwapchainImagesKHR(VulkanManager::instance()->GetVulkanDevice(), swapChain, &expectBufferCount, nullptr);
+    mSwapChainImages.resize(expectBufferCount);
+    vkGetSwapchainImagesKHR(VulkanManager::instance()->GetVulkanDevice(), swapChain, &expectBufferCount, mSwapChainImages.data());
+
+    mSwapChainImageFormat = expectFormat.format;
+    mSwapChainExtent = deviceWrapper->GetExpectSwapChainExtent();
+}
+
+VkFramebuffer VulkanSwapChainWrapper::GetBuffer(size_t bufferIndex) const
+{
+    if (bufferIndex >= mSwapChainFrameBuffers.size())
+        return nullptr;
+
+    return mSwapChainFrameBuffers[bufferIndex];
 }
 
 void VulkanSwapChainWrapper::CreateImageViews()
@@ -105,45 +115,30 @@ void VulkanSwapChainWrapper::CreateImageViews()
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(GetVulkanResource()->GetVulkanDevice(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS)
+        if (vkCreateImageView(VulkanManager::instance()->GetVulkanDevice(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS)
             Logger::LogFatal("VulkanRender", "failed to create image views!");
     }
 }
 
-VkSurfaceFormatKHR VulkanSwapChainWrapper::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
+void VulkanSwapChainWrapper::CreateFrameBuffers()
 {
-    for (const auto& availableFormat : availableFormats)
+    if (mSwapChainImageViews.empty())
+        return;
+
+    mSwapChainFrameBuffers.resize(mSwapChainImageViews.size());
+
+    for (size_t i = 0; i < mSwapChainImageViews.size(); i++)
     {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            return availableFormat;
+        VkImageView attachments[] = {mSwapChainImageViews[i]};
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = VulkanManager::instance()->GetRenderPass();
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = mSwapChainExtent.width;
+        framebufferInfo.height = mSwapChainExtent.height;
+        framebufferInfo.layers = 1;
+        if (vkCreateFramebuffer(VulkanManager::instance()->GetVulkanDevice(), &framebufferInfo, nullptr, &mSwapChainFrameBuffers[i]) != VK_SUCCESS)
+            Logger::LogFatal("VulkanRender", "failed to create framebuffer!");
     }
-
-    return availableFormats[0];
-}
-
-VkPresentModeKHR VulkanSwapChainWrapper::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
-{
-    for (const auto& availablePresentMode : availablePresentModes)
-    {
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-            return availablePresentMode;
-    }
-
-    return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D VulkanSwapChainWrapper::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
-{
-    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
-        return capabilities.currentExtent;
-
-    VkSurfaceCapabilitiesKHR surfaceCapabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(GetVulkanResource()->GetPhysicalDevice(), GetVulkanResource()->GetSurface(), &surfaceCapabilities);
-
-    VkExtent2D actualExtent = surfaceCapabilities.currentExtent;
-
-    actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-    actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
-
-    return actualExtent;
 }

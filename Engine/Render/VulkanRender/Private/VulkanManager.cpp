@@ -10,71 +10,58 @@ void VulkanManager::StartupModule() {}
 
 void VulkanManager::ShutdownModule()
 {
-    mSwapChain.Destroy();
+    while (!mResourceStack.empty())
+    {
+        auto resource = mResourceStack.top();
+        resource->DestroyResource();
+        mResourceStack.pop();
+    }
 
-    mDevice.Destroy();
-
-    DestroySurface();
-
-    mMainWindow.Destroy();
-
-    mInstance.UninitVulkanInstance();
-
-    TerminalGlfw();
+    glfwTerminate();
 }
 
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
 {
-    if (mMainWindow.GetWindow() != nullptr)
-        return &mMainWindow;
+    if (mMainWindow != nullptr)
+        return mMainWindow.get();
 
-    InitGlfw();
-
-    mMainWindow.SetWH(width, height);
-    mMainWindow.SetWindowName(title);
-    mMainWindow.Create();
-
-    mInstance.InitVulkanInstance();
-
-    CreateSurface();
-
-    mDevice.Create();
-
-    mSwapChain.Create();
-
-    return &mMainWindow;
-}
-
-void VulkanManager::InitGlfw()
-{
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    mMainWindow = make_shared<GlfwWindow>();
+    mMainWindow->SetWH(width, height);
+    mMainWindow->SetWindowName(title);
+    InitResource(mMainWindow);
+
+    mInstance = make_shared<VulkanInstanceWrapper>();
+    InitResource(mInstance);
+
+    mSurface = make_shared<VulkanSurfaceWrapper>();
+    InitResource(mSurface);
+
+    mDevice = make_shared<VulkanDeviceWrapper>();
+    InitResource(mDevice);
+
+    mRenderPass = make_shared<VulkanRenderPass>();
+    InitResource(mRenderPass);
+
+    mSwapChain = make_shared<VulkanSwapChainWrapper>();
+    InitResource(mSwapChain);
+
+    mPipeline = make_shared<VulkanGraphicsPipeline>();
+    InitResource(mPipeline);
+
+    mSyncObject = make_shared<VulkanSyncWrapper>();
+    InitResource(mSyncObject);
+
+    return mMainWindow.get();
 }
 
-void VulkanManager::TerminalGlfw()
+void VulkanManager::InitResource(std::shared_ptr<IVulkanResource> resource)
 {
-    glfwTerminate();
-}
-
-void VulkanManager::CreateSurface()
-{
-    VkWin32SurfaceCreateInfoKHR createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    createInfo.hwnd = glfwGetWin32Window(mMainWindow.GetWindow());
-    createInfo.hinstance = GetModuleHandle(nullptr);
-
-    VkSurfaceKHR surface = nullptr;
-    if (vkCreateWin32SurfaceKHR(mInstance.GetVulkanInstance(), &createInfo, nullptr, &surface) != VK_SUCCESS)
-        return Logger::LogFatal("VulkanRender", "Failed to create window surface!");
-    else
-        mSurface = surface;
-}
-
-void VulkanManager::DestroySurface()
-{
-    if (nullptr == mSurface)
+    if (nullptr == resource)
         return;
 
-    vkDestroySurfaceKHR(mInstance.GetVulkanInstance(), mSurface, nullptr);
-    mSurface = nullptr;
+    resource->CreateResource();
+    mResourceStack.push(resource);
 }

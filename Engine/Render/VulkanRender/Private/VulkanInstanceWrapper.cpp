@@ -24,7 +24,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
-void VulkanInstanceWrapper::InitVulkanInstance()
+void VulkanInstanceWrapper::CreateResource()
 {
     // app info
     VkApplicationInfo appInfo{};
@@ -88,7 +88,7 @@ void VulkanInstanceWrapper::InitVulkanInstance()
     CheckInstanceExtension();
 }
 
-void VulkanInstanceWrapper::UninitVulkanInstance()
+void VulkanInstanceWrapper::DestroyResource()
 {
     if (!mInstance)
         return;

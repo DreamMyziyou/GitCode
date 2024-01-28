@@ -7,20 +7,20 @@
 
 #include "VulkanResource.h"
 
-class VulkanInstanceWrapper final
+class VulkanInstanceWrapper final : public IVulkanResource
 {
 public:
     VulkanInstanceWrapper() = default;
-    ~VulkanInstanceWrapper() = default;
+    ~VulkanInstanceWrapper() override = default;
     VulkanInstanceWrapper(const VulkanInstanceWrapper&) = delete;
     VulkanInstanceWrapper& operator=(const VulkanInstanceWrapper&) = delete;
 
 public:
-    // get
-    VkInstance GetVulkanInstance() const { return mInstance; }
+    void CreateResource() override;
+    void DestroyResource() override;
 
-    void InitVulkanInstance();
-    void UninitVulkanInstance();
+public:
+    VkInstance GetVulkanInstance() const { return mInstance; }
 
 private:
     // check

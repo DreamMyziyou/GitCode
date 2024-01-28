@@ -7,27 +7,28 @@
 
 #include "VulkanResource.h"
 
-class VulkanSwapChainWrapper final
+class VulkanSwapChainWrapper final : public IVulkanResource
 {
 public:
     VulkanSwapChainWrapper() = default;
-    ~VulkanSwapChainWrapper() = default;
+    ~VulkanSwapChainWrapper() override = default;
     VulkanSwapChainWrapper(const VulkanSwapChainWrapper&) = delete;
     VulkanSwapChainWrapper& operator=(const VulkanSwapChainWrapper&) = delete;
 
 public:
-    VkSwapchainKHR GetSwapChain() const { return mSwapChain; }
+    void CreateResource() override;
+    void DestroyResource() override;
 
-    void Create();
-    void Destroy();
+public:
+    VkSwapchainKHR GetSwapChain() const { return mSwapChain; }
+    VkFormat GetFormat() const { return mSwapChainImageFormat; }
+    VkExtent2D GetSwapChainExtent() const { return mSwapChainExtent; }
+    VkFramebuffer GetBuffer(size_t bufferIndex) const;
 
 private:
     void CreateSwapChain();
     void CreateImageViews();
-
-    VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const;
-    VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const;
-    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
+    void CreateFrameBuffers();
 
 private:
     VkSwapchainKHR mSwapChain = nullptr;
@@ -35,6 +36,7 @@ private:
     VkFormat mSwapChainImageFormat{};
     VkExtent2D mSwapChainExtent{};
     std::vector<VkImageView> mSwapChainImageViews;
+    std::vector<VkFramebuffer> mSwapChainFrameBuffers;
 };
 
 #endif  // WORKENGINE_VULKANSWAPCHAINWRAPPER_H
