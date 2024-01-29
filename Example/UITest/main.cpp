@@ -6,8 +6,6 @@
 
 int main(int argc, char** argv)
 {
-    Application::instance()->Start();
     Application::instance()->Run();
-    Application::instance()->Stop();
     return 0;
 }

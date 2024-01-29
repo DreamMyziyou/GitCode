@@ -14,6 +14,9 @@ protected:
     virtual ~App();
     App(const App&) = delete;
     App& operator=(const App&) = delete;
+
+public:
+    virtual void Run() = 0;
 };
 
 #endif  // WORKENGINE_APP_H

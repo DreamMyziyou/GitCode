@@ -5,21 +5,12 @@
 #ifndef WORKENGINE_APPLICATION_H
 #define WORKENGINE_APPLICATION_H
 
-#include "App/App.h"
+#include "App/WindowApp.h"
 #include "Core/Common/ClassMacro.h"
 
-class Application final : public App
+class Application final : public WindowApp
 {
-    SINGLETON_CLASS_CUSTOM_CONSTRUCT(Application)
-
-public:
-    void Start();
-    void Run();
-    void Stop();
-
-private:
-    struct Impl;
-    Impl* mImpl = nullptr;
+    SINGLETON_CLASS(Application)
 };
 
 #endif  // WORKENGINE_APPLICATION_H
