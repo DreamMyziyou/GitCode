@@ -20,12 +20,18 @@ void VulkanDeviceWrapper::CreateResource()
     CreatePhysicalDevice();
     CreateLogicDevice();
     CreateCommand();
+
+    mSyncObject = make_shared<VulkanSyncWrapper>();
+    mSyncObject->CreateResource();
 }
 
 void VulkanDeviceWrapper::DestroyResource()
 {
-    if (!mCommandPool)
+    if (nullptr == mSyncObject)
         return;
+
+    mSyncObject->DestroyResource();
+    mSyncObject = nullptr;
 
     vkDestroyCommandPool(mLogicDevice, mCommandPool, nullptr);
     mCommandPool = nullptr;
@@ -181,14 +187,11 @@ void VulkanDeviceWrapper::CreateCommand()
         return;
     mCommandPool = commandPool;
 
+    mCommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
-    VkCommandBuffer commandBuffer;
-    vkResult = vkAllocateCommandBuffers(mLogicDevice, &allocInfo, &commandBuffer);
-    if (vkResult != VkResult::VK_SUCCESS)
-        return;
-    mCommandBuffer = commandBuffer;
+    allocInfo.commandBufferCount = (uint32_t)mCommandBuffers.size();
+    vkAllocateCommandBuffers(mLogicDevice, &allocInfo, mCommandBuffers.data());
 }

@@ -6,6 +6,7 @@
 #define WORKENGINE_VULKANDEVICEWRAPPER_H
 
 #include "VulkanResource.h"
+#include "VulkanSyncWrapper.h"
 
 class VulkanDeviceWrapper final : public IVulkanResource
 {
@@ -25,7 +26,9 @@ public:
     VkQueue GetGraphicsQueue() const { return mGraphicsQueue; }
     VkQueue GetPresentQueue() const { return mPresentQueue; }
     VkCommandPool GetCommandPool() const { return mCommandPool; }
-    VkCommandBuffer GetCommandBuffer() const { return mCommandBuffer; }
+    VkCommandBuffer GetCommandBuffer(size_t index) const { return mCommandBuffers[index]; }
+
+    std::shared_ptr<VulkanSyncWrapper> GetSyncWrapper() const { return mSyncObject; }
 
 private:
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
@@ -42,7 +45,9 @@ private:
     VkQueue mGraphicsQueue = nullptr;
     VkQueue mPresentQueue = nullptr;
     VkCommandPool mCommandPool = nullptr;
-    VkCommandBuffer mCommandBuffer = nullptr;
+    std::vector<VkCommandBuffer> mCommandBuffers;
+
+    std::shared_ptr<VulkanSyncWrapper> mSyncObject = nullptr;
 };
 
 #endif  // WORKENGINE_VULKANDEVICEWRAPPER_H

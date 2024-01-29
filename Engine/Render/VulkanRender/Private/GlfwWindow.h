@@ -13,6 +13,9 @@
 
 class GlfwWindow final : public Render::IMainWindow, public IVulkanResource
 {
+private:
+    static void OnFramebufferResizeCallback(GLFWwindow* window, int width, int height);
+
 public:
     GlfwWindow();
     ~GlfwWindow() override;
@@ -36,13 +39,17 @@ private:
     // temp for check world
     void CheckUpdate();
 
-    void DrawCall();
+    void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+    void DrawFrame();
 
 private:
     int32 mWidth = 800;
     int32 mHeight = 600;
     String mWindowName = "Window";
     GLFWwindow* mWindow = nullptr;
+
+    bool mIsResize = false;
+    int mCurrentFrame = 0;
 };
 
 #endif  // WORKENGINE_GLFWWINDOW_H

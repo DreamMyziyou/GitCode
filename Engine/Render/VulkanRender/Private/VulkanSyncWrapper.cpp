@@ -7,6 +7,10 @@
 
 void VulkanSyncWrapper::CreateResource()
 {
+    mImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    mRenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    mInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -16,36 +20,35 @@ void VulkanSyncWrapper::CreateResource()
 
     auto device = VulkanManager::instance()->GetDevice();
 
-    auto vkResult = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &mImageAvailableSemaphore);
-    if (vkResult != VK_SUCCESS)
-        return;
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+    {
+        auto vkResult = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &mImageAvailableSemaphores[i]);
+        if (vkResult != VK_SUCCESS)
+            return;
 
-    vkResult = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &mRenderFinishedSemaphore);
-    if (vkResult != VK_SUCCESS)
-        return;
+        vkResult = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &mRenderFinishedSemaphores[i]);
+        if (vkResult != VK_SUCCESS)
+            return;
 
-    vkResult = vkCreateFence(device, &fenceInfo, nullptr, &mInFlightFence);
+        vkResult = vkCreateFence(device, &fenceInfo, nullptr, &mInFlightFences[i]);
+        if (vkResult != VK_SUCCESS)
+            return;
+    }
 }
 
 void VulkanSyncWrapper::DestroyResource()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
-    if (mImageAvailableSemaphore)
-    {
-        vkDestroySemaphore(device, mImageAvailableSemaphore, nullptr);
-        mImageAvailableSemaphore = nullptr;
-    }
+    for (auto& item : mImageAvailableSemaphores)
+        vkDestroySemaphore(device, item, nullptr);
+    mImageAvailableSemaphores.clear();
 
-    if (mRenderFinishedSemaphore)
-    {
-        vkDestroySemaphore(device, mRenderFinishedSemaphore, nullptr);
-        mRenderFinishedSemaphore = nullptr;
-    }
+    for (auto& item : mRenderFinishedSemaphores)
+        vkDestroySemaphore(device, item, nullptr);
+    mRenderFinishedSemaphores.clear();
 
-    if (mInFlightFence)
-    {
-        vkDestroyFence(device, mInFlightFence, nullptr);
-        mInFlightFence = nullptr;
-    }
+    for (auto& item : mInFlightFences)
+        vkDestroyFence(device, item, nullptr);
+    mInFlightFences.clear();
 }

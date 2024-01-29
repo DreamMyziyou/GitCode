@@ -48,13 +48,28 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
     mPipeline = make_shared<VulkanGraphicsPipeline>();
     InitResource(mPipeline);
 
-    mSyncObject = make_shared<VulkanSyncWrapper>();
-    InitResource(mSyncObject);
-
     mSwapChain = make_shared<VulkanSwapChainWrapper>();
     InitResource(mSwapChain);
 
     return mMainWindow.get();
+}
+
+void VulkanManager::ReCreateSwapChain()
+{
+    auto window = GetWindow();
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window, &width, &height);
+    while (width == 0 || height == 0)
+    {
+        glfwGetFramebufferSize(window, &width, &height);
+        glfwWaitEvents();
+    }
+
+    vkDeviceWaitIdle(GetDevice());
+
+    mSurface->OnUpdate(mDevice->GetPhysicalDevice());
+    mSwapChain->DestroyResource();
+    mSwapChain->CreateResource();
 }
 
 void VulkanManager::InitResource(std::shared_ptr<IVulkanResource> resource)

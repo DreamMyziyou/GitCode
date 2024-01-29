@@ -17,7 +17,6 @@
 #include "VulkanRenderPass.h"
 #include "VulkanSurfaceWrapper.h"
 #include "VulkanSwapChainWrapper.h"
-#include "VulkanSyncWrapper.h"
 
 class VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager
 {
@@ -35,10 +34,11 @@ public:
     std::shared_ptr<VulkanSurfaceWrapper> GetSurfaceWrapper() const { return mSurface; }
     std::shared_ptr<VulkanDeviceWrapper> GetDeviceWrapper() const { return mDevice; }
     std::shared_ptr<VulkanGraphicsPipeline> GetPipelineWrapper() const { return mPipeline; }
-    std::shared_ptr<VulkanSyncWrapper> GetSyncObject() const { return mSyncObject; }
     std::shared_ptr<VulkanSwapChainWrapper> GetSwapChainWrapper() const { return mSwapChain; }
 
     Render::IMainWindow* CreateMainWindow(int width, int height, String title);
+
+    void ReCreateSwapChain();
 
 private:
     void InitResource(std::shared_ptr<IVulkanResource> resource);
@@ -52,7 +52,6 @@ private:
     std::shared_ptr<VulkanDeviceWrapper> mDevice = nullptr;
     std::shared_ptr<VulkanRenderPass> mRenderPass = nullptr;
     std::shared_ptr<VulkanGraphicsPipeline> mPipeline = nullptr;
-    std::shared_ptr<VulkanSyncWrapper> mSyncObject = nullptr;
     std::shared_ptr<VulkanSwapChainWrapper> mSwapChain = nullptr;
 };
 

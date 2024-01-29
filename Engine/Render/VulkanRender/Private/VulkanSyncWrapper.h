@@ -19,14 +19,14 @@ public:
     void DestroyResource() override;
 
 public:
-    VkSemaphore GetImageAvailableSemaphore() const { return mImageAvailableSemaphore; }
-    VkSemaphore GetFinishedSemaphore() const { return mRenderFinishedSemaphore; }
-    VkFence GetFence() const { return mInFlightFence; }
+    VkSemaphore GetImageAvailableSemaphore(int index) const { return mImageAvailableSemaphores[index]; }
+    VkSemaphore GetFinishedSemaphore(int index) const { return mRenderFinishedSemaphores[index]; }
+    VkFence GetFence(int index) const { return mInFlightFences[index]; }
 
 private:
-    VkSemaphore mImageAvailableSemaphore;
-    VkSemaphore mRenderFinishedSemaphore;
-    VkFence mInFlightFence;
+    std::vector<VkSemaphore> mImageAvailableSemaphores;
+    std::vector<VkSemaphore> mRenderFinishedSemaphores;
+    std::vector<VkFence> mInFlightFences;
 };
 
 #endif  // WORKENGINE_VULKANSYNCWRAPPER_H
