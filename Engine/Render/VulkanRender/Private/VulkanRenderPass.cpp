@@ -2,12 +2,13 @@
 // Created by WeslyChen on 2024/1/28.
 //
 #include "VulkanRenderPass.h"
+
 #include "VulkanManager.h"
 
 void VulkanRenderPass::CreateResource()
 {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = VulkanManager::instance()->GetSwapChainFormat();
+    colorAttachment.format = VulkanManager::instance()->GetSurfaceWrapper()->GetExpectSurfaceFormat().format;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -33,7 +34,7 @@ void VulkanRenderPass::CreateResource()
     renderPassInfo.pSubpasses = &subpass;
 
     VkRenderPass renderPass;
-    auto vkResult = vkCreateRenderPass(VulkanManager::instance()->GetVulkanDevice(), &renderPassInfo, nullptr, &renderPass);
+    auto vkResult = vkCreateRenderPass(VulkanManager::instance()->GetDevice(), &renderPassInfo, nullptr, &renderPass);
     if (vkResult != VK_SUCCESS)
         return;
     mRenderPass = renderPass;
@@ -44,6 +45,6 @@ void VulkanRenderPass::DestroyResource()
     if (nullptr == mRenderPass)
         return;
 
-    vkDestroyRenderPass(VulkanManager::instance()->GetVulkanDevice(), mRenderPass, nullptr);
+    vkDestroyRenderPass(VulkanManager::instance()->GetDevice(), mRenderPass, nullptr);
     mRenderPass = nullptr;
 }

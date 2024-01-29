@@ -45,14 +45,14 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
     mRenderPass = make_shared<VulkanRenderPass>();
     InitResource(mRenderPass);
 
-    mSwapChain = make_shared<VulkanSwapChainWrapper>();
-    InitResource(mSwapChain);
-
     mPipeline = make_shared<VulkanGraphicsPipeline>();
     InitResource(mPipeline);
 
     mSyncObject = make_shared<VulkanSyncWrapper>();
     InitResource(mSyncObject);
+
+    mSwapChain = make_shared<VulkanSwapChainWrapper>();
+    InitResource(mSwapChain);
 
     return mMainWindow.get();
 }

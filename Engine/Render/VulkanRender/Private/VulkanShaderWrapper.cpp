@@ -30,7 +30,7 @@ void VulkanShaderWrapper::CreateResource()
     createInfo.pCode = reinterpret_cast<const uint32_t*>(buffer.data());
 
     VkShaderModule shaderModule;
-    auto vkResult = vkCreateShaderModule(VulkanManager::instance()->GetVulkanDevice(), &createInfo, nullptr, &shaderModule);
+    auto vkResult = vkCreateShaderModule(VulkanManager::instance()->GetDevice(), &createInfo, nullptr, &shaderModule);
     if (vkResult != VkResult::VK_SUCCESS)
         return;
     mShader = shaderModule;
@@ -47,6 +47,6 @@ void VulkanShaderWrapper::DestroyResource()
     if (nullptr == mShader)
         return;
 
-    vkDestroyShaderModule(VulkanManager::instance()->GetVulkanDevice(), mShader, nullptr);
+    vkDestroyShaderModule(VulkanManager::instance()->GetDevice(), mShader, nullptr);
     mShader = nullptr;
 }

@@ -17,37 +17,46 @@ void VulkanSwapChainWrapper::CreateResource()
 
 void VulkanSwapChainWrapper::DestroyResource()
 {
+    auto device = VulkanManager::instance()->GetDevice();
+
     for (auto framebuffer : mSwapChainFrameBuffers)
-        vkDestroyFramebuffer(VulkanManager::instance()->GetVulkanDevice(), framebuffer, nullptr);
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
     mSwapChainFrameBuffers.clear();
 
     for (auto imageView : mSwapChainImageViews)
-        vkDestroyImageView(VulkanManager::instance()->GetVulkanDevice(), imageView, nullptr);
+        vkDestroyImageView(device, imageView, nullptr);
     mSwapChainImageViews.clear();
 
     mSwapChainImages.clear();
 
-    vkDestroySwapchainKHR(VulkanManager::instance()->GetVulkanDevice(), mSwapChain, nullptr);
+    vkDestroySwapchainKHR(device, mSwapChain, nullptr);
     mSwapChain = nullptr;
 }
 
 void VulkanSwapChainWrapper::CreateSwapChain()
 {
+    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
+    auto expectFormat = surfaceWrapper->GetExpectSurfaceFormat();
+    auto expectSwapExtent = surfaceWrapper->GetExpectSwapChainExtent();
+    auto expectBufferCount = surfaceWrapper->GetExpectSwapChainBufferCount();
+    auto presentMode = surfaceWrapper->GetExpectPresentMode();
+    auto& surfaceCapabilities = surfaceWrapper->GetSurfaceCapabilities();
+
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
-    auto expectFormat = deviceWrapper->GetExpectSurfaceFormat();
-    auto expectBufferCount = deviceWrapper->GetExpectSwapChainBufferCount();
+    auto physicalDevice = deviceWrapper->GetPhysicalDevice();
+    auto device = deviceWrapper->GetLogicDevice();
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = VulkanManager::instance()->GetSurface();
+    createInfo.surface = surfaceWrapper->GetSurface();
     createInfo.minImageCount = expectBufferCount;
     createInfo.imageFormat = expectFormat.format;
     createInfo.imageColorSpace = expectFormat.colorSpace;
-    createInfo.imageExtent = deviceWrapper->GetExpectSwapChainExtent();
+    createInfo.imageExtent = expectSwapExtent;
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices indices = FindQueueFamilies(VulkanManager::instance()->GetPhysicalDevice());
+    auto indices = surfaceWrapper->FindQueueFamilies(physicalDevice);
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     if (indices.graphicsFamily != indices.presentFamily)
@@ -63,24 +72,24 @@ void VulkanSwapChainWrapper::CreateSwapChain()
         createInfo.pQueueFamilyIndices = nullptr;  // Optional
     }
 
-    createInfo.preTransform = deviceWrapper->GetSurfaceCapabilities().currentTransform;
+    createInfo.preTransform = surfaceCapabilities.currentTransform;
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    createInfo.presentMode = deviceWrapper->GetExpectPresentMode();
+    createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     VkSwapchainKHR swapChain;
-    if (vkCreateSwapchainKHR(VulkanManager::instance()->GetVulkanDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+    if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "failed to create swap chain!");
 
     mSwapChain = swapChain;
 
-    vkGetSwapchainImagesKHR(VulkanManager::instance()->GetVulkanDevice(), swapChain, &expectBufferCount, nullptr);
+    vkGetSwapchainImagesKHR(device, swapChain, &expectBufferCount, nullptr);
     mSwapChainImages.resize(expectBufferCount);
-    vkGetSwapchainImagesKHR(VulkanManager::instance()->GetVulkanDevice(), swapChain, &expectBufferCount, mSwapChainImages.data());
+    vkGetSwapchainImagesKHR(device, swapChain, &expectBufferCount, mSwapChainImages.data());
 
     mSwapChainImageFormat = expectFormat.format;
-    mSwapChainExtent = deviceWrapper->GetExpectSwapChainExtent();
+    mSwapChainExtent = expectSwapExtent;
 }
 
 VkFramebuffer VulkanSwapChainWrapper::GetBuffer(size_t bufferIndex) const
@@ -115,7 +124,7 @@ void VulkanSwapChainWrapper::CreateImageViews()
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(VulkanManager::instance()->GetVulkanDevice(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS)
+        if (vkCreateImageView(VulkanManager::instance()->GetDevice(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS)
             Logger::LogFatal("VulkanRender", "failed to create image views!");
     }
 }
@@ -138,7 +147,7 @@ void VulkanSwapChainWrapper::CreateFrameBuffers()
         framebufferInfo.width = mSwapChainExtent.width;
         framebufferInfo.height = mSwapChainExtent.height;
         framebufferInfo.layers = 1;
-        if (vkCreateFramebuffer(VulkanManager::instance()->GetVulkanDevice(), &framebufferInfo, nullptr, &mSwapChainFrameBuffers[i]) != VK_SUCCESS)
+        if (vkCreateFramebuffer(VulkanManager::instance()->GetDevice(), &framebufferInfo, nullptr, &mSwapChainFrameBuffers[i]) != VK_SUCCESS)
             Logger::LogFatal("VulkanRender", "failed to create framebuffer!");
     }
 }

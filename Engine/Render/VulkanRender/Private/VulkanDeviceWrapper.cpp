@@ -4,8 +4,6 @@
 
 #include "VulkanDeviceWrapper.h"
 
-#include <algorithm>
-#include <limits>
 #include <map>
 #include <set>
 #include <vector>
@@ -19,11 +17,6 @@ static const vector<const char*> gDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION
 
 void VulkanDeviceWrapper::CreateResource()
 {
-    auto vulkanInstance = VulkanManager::instance()->GetVulkanInstance();
-    auto surface = VulkanManager::instance()->GetSurface();
-    if (!vulkanInstance || !surface)
-        return;
-
     CreatePhysicalDevice();
     CreateLogicDevice();
     CreateCommand();
@@ -62,7 +55,9 @@ bool VulkanDeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
     if (!device)
         return false;
 
-    QueueFamilyIndices indices = FindQueueFamilies(device);
+    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
+
+    auto indices = surfaceWrapper->FindQueueFamilies(device);
     if (!indices.IsComplete())
         return false;
 
@@ -70,7 +65,7 @@ bool VulkanDeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
     if (!extensionsSupported)
         return false;
 
-    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+    auto swapChainSupport = surfaceWrapper->QuerySwapChainSupport(device);
     bool swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 
     if (!swapChainAdequate)
@@ -106,72 +101,6 @@ int32 VulkanDeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
     return score;
 }
 
-VulkanDeviceWrapper::SwapChainSupportDetails VulkanDeviceWrapper::QuerySwapChainSupport(VkPhysicalDevice device) const
-{
-    SwapChainSupportDetails details;
-
-    auto surface = VulkanManager::instance()->GetSurface();
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
-
-    uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-
-    if (formatCount != 0)
-    {
-        details.formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
-    }
-
-    uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
-
-    if (presentModeCount != 0)
-    {
-        details.presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
-    }
-
-    return details;
-}
-
-VkSurfaceFormatKHR VulkanDeviceWrapper::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
-{
-    for (const auto& availableFormat : availableFormats)
-    {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            return availableFormat;
-    }
-
-    return availableFormats[0];
-}
-
-VkPresentModeKHR VulkanDeviceWrapper::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
-{
-    for (const auto& availablePresentMode : availablePresentModes)
-    {
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-            return availablePresentMode;
-    }
-
-    return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D VulkanDeviceWrapper::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
-{
-    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
-        return capabilities.currentExtent;
-
-    VkSurfaceCapabilitiesKHR surfaceCapabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mPhysicalDevice, VulkanManager::instance()->GetSurface(), &surfaceCapabilities);
-
-    VkExtent2D actualExtent = surfaceCapabilities.currentExtent;
-
-    actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-    actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
-
-    return actualExtent;
-}
-
 void VulkanDeviceWrapper::CreatePhysicalDevice()
 {
     // Get device
@@ -195,6 +124,8 @@ void VulkanDeviceWrapper::CreatePhysicalDevice()
         mPhysicalDevice = candidates.rbegin()->second;
     else
         return Logger::LogFatal("VulkanRender", "Failed to find a suitable GPU!");
+
+    VulkanManager::instance()->GetSurfaceWrapper()->OnUpdate(mPhysicalDevice);
 }
 
 void VulkanDeviceWrapper::CreateLogicDevice()
@@ -202,7 +133,8 @@ void VulkanDeviceWrapper::CreateLogicDevice()
     if (!mPhysicalDevice)
         return;
 
-    QueueFamilyIndices indices = FindQueueFamilies(mPhysicalDevice);
+    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
+    auto indices = surfaceWrapper->FindQueueFamilies(mPhysicalDevice);
 
     vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
@@ -237,21 +169,12 @@ void VulkanDeviceWrapper::CreateLogicDevice()
 
 void VulkanDeviceWrapper::CreateCommand()
 {
-    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(mPhysicalDevice);
-    mSurfaceCapabilities = swapChainSupport.capabilities;
-    mExpectSurfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-    mExpectPresentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-    mExpectSwapChainExtent = ChooseSwapExtent(swapChainSupport.capabilities);
-    uint32 imageCount = swapChainSupport.capabilities.minImageCount + 1;
-    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
-        imageCount = swapChainSupport.capabilities.maxImageCount;
-    mExpectSwapChainBufferCount = imageCount;
-
-    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(mPhysicalDevice);
+    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
+    auto indices = surfaceWrapper->FindQueueFamilies(mPhysicalDevice);
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+    poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
     VkCommandPool commandPool;
     auto vkResult = vkCreateCommandPool(mLogicDevice, &poolInfo, nullptr, &commandPool);
     if (vkResult != VkResult::VK_SUCCESS)

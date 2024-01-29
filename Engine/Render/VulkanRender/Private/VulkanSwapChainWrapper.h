@@ -21,7 +21,6 @@ public:
 
 public:
     VkSwapchainKHR GetSwapChain() const { return mSwapChain; }
-    VkFormat GetFormat() const { return mSwapChainImageFormat; }
     VkExtent2D GetSwapChainExtent() const { return mSwapChainExtent; }
     VkFramebuffer GetBuffer(size_t bufferIndex) const;
 

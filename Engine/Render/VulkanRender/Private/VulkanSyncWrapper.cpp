@@ -14,7 +14,7 @@ void VulkanSyncWrapper::CreateResource()
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    auto device = VulkanManager::instance()->GetVulkanDevice();
+    auto device = VulkanManager::instance()->GetDevice();
 
     auto vkResult = vkCreateSemaphore(device, &semaphoreInfo, nullptr, &mImageAvailableSemaphore);
     if (vkResult != VK_SUCCESS)
@@ -29,7 +29,7 @@ void VulkanSyncWrapper::CreateResource()
 
 void VulkanSyncWrapper::DestroyResource()
 {
-    auto device = VulkanManager::instance()->GetVulkanDevice();
+    auto device = VulkanManager::instance()->GetDevice();
 
     if (mImageAvailableSemaphore)
     {

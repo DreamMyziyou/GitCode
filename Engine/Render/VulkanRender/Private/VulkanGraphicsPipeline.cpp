@@ -15,7 +15,8 @@ void VulkanGraphicsPipeline::CreateResource()
     dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
     dynamicState.pDynamicStates = dynamicStates.data();
 
-    auto swapChainExtent = VulkanManager::instance()->GetSwapChainExtent();
+    auto device = VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice();
+    auto swapChainExtent = VulkanManager::instance()->GetSurfaceWrapper()->GetExpectSwapChainExtent();
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -87,7 +88,7 @@ void VulkanGraphicsPipeline::CreateResource()
     pipelineLayoutInfo.pushConstantRangeCount = 0;  // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr;  // Optional
 
-    auto vkResult = vkCreatePipelineLayout(VulkanManager::instance()->GetVulkanDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout);
+    auto vkResult = vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout);
     if (vkResult != VK_SUCCESS)
         return;
 
@@ -115,7 +116,7 @@ void VulkanGraphicsPipeline::CreateResource()
     pipelineInfo.basePipelineIndex = -1;  // Optional
 
     VkPipeline graphicsPipeline;
-    vkResult = vkCreateGraphicsPipelines(VulkanManager::instance()->GetVulkanDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline);
+    vkResult = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline);
     if (vkResult != VK_SUCCESS)
         return;
     mPipeline = graphicsPipeline;
@@ -126,7 +127,8 @@ void VulkanGraphicsPipeline::DestroyResource()
     if (nullptr == mPipelineLayout)
         return;
 
-    vkDestroyPipeline(VulkanManager::instance()->GetVulkanDevice(), mPipeline, nullptr);
+    auto device = VulkanManager::instance()->GetDevice();
+    vkDestroyPipeline(device, mPipeline, nullptr);
 
     if (mVertexShader)
     {
@@ -140,7 +142,7 @@ void VulkanGraphicsPipeline::DestroyResource()
         mFragShader = nullptr;
     }
 
-    vkDestroyPipelineLayout(VulkanManager::instance()->GetVulkanDevice(), mPipelineLayout, nullptr);
+    vkDestroyPipelineLayout(device, mPipelineLayout, nullptr);
     mPipelineLayout = nullptr;
 }
 

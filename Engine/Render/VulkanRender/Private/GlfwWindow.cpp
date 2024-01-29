@@ -29,7 +29,7 @@ void GlfwWindow::Run()
         DrawCall();
     }
 
-    vkDeviceWaitIdle(VulkanManager::instance()->GetVulkanDevice());
+    vkDeviceWaitIdle(VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice());
 }
 
 void GlfwWindow::CreateResource()

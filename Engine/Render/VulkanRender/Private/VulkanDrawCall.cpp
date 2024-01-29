@@ -63,7 +63,7 @@ void VulkanDrawCall::Draw()
     auto inFlightFence = syncObject->GetFence();
     auto imageAvailableSemaphore = syncObject->GetImageAvailableSemaphore();
     auto renderFinishedSemaphore = syncObject->GetFinishedSemaphore();
-    auto swapChain = VulkanManager::instance()->GetSwapChain();
+    auto swapChainWrapper = VulkanManager::instance()->GetSwapChainWrapper();
     auto commandBuffer = deviceWrapper->GetCommandBuffer();
     auto graphicsQueue = deviceWrapper->GetGraphicsQueue();
     auto presentQueue = deviceWrapper->GetPresentQueue();
@@ -72,7 +72,7 @@ void VulkanDrawCall::Draw()
     vkResetFences(device, 1, &inFlightFence);
 
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    vkAcquireNextImageKHR(device, swapChainWrapper->GetSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
     vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
     RecordCommandBuffer(commandBuffer, imageIndex);
@@ -102,7 +102,7 @@ void VulkanDrawCall::Draw()
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = {swapChain};
+    VkSwapchainKHR swapChains[] = {swapChainWrapper->GetSwapChain()};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 

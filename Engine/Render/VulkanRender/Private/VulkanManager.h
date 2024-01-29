@@ -28,23 +28,17 @@ public:
     void ShutdownModule() override;
 
 public:
+    GLFWwindow* GetWindow() const { return mMainWindow->GetWindow(); }
     VkInstance GetVulkanInstance() const { return mInstance->GetVulkanInstance(); }
-    GLFWwindow* GetWindowHandle() const { return mMainWindow->GetWindow(); }
-    VkSurfaceKHR GetSurface() const { return mSurface->GetSurface(); }
-    VkPhysicalDevice GetPhysicalDevice() const { return mDevice->GetPhysicalDevice(); }
-    VkDevice GetVulkanDevice() const { return mDevice->GetLogicDevice(); }
-    VkQueue GetGraphicsQueue() const { return mDevice->GetGraphicsQueue(); }
-    VkFormat GetSwapChainFormat() const { return mDevice->GetExpectSurfaceFormat().format; }
-    VkExtent2D GetSwapChainExtent() const { return mDevice->GetExpectSwapChainExtent(); }
+    VkDevice GetDevice() const { return mDevice->GetLogicDevice(); }
     VkRenderPass GetRenderPass() const { return mRenderPass->GetRenderPass(); }
-    VkSwapchainKHR GetSwapChain() const { return mSwapChain->GetSwapChain(); }
-
-    Render::IMainWindow* CreateMainWindow(int width, int height, String title);
+    std::shared_ptr<VulkanSurfaceWrapper> GetSurfaceWrapper() const { return mSurface; }
     std::shared_ptr<VulkanDeviceWrapper> GetDeviceWrapper() const { return mDevice; }
-    std::shared_ptr<VulkanRenderPass> GetRenderPassWrapper() const { return mRenderPass; }
-    std::shared_ptr<VulkanSwapChainWrapper> GetSwapChainWrapper() const { return mSwapChain; }
     std::shared_ptr<VulkanGraphicsPipeline> GetPipelineWrapper() const { return mPipeline; }
     std::shared_ptr<VulkanSyncWrapper> GetSyncObject() const { return mSyncObject; }
+    std::shared_ptr<VulkanSwapChainWrapper> GetSwapChainWrapper() const { return mSwapChain; }
+
+    Render::IMainWindow* CreateMainWindow(int width, int height, String title);
 
 private:
     void InitResource(std::shared_ptr<IVulkanResource> resource);
@@ -57,9 +51,9 @@ private:
     std::shared_ptr<VulkanSurfaceWrapper> mSurface = nullptr;
     std::shared_ptr<VulkanDeviceWrapper> mDevice = nullptr;
     std::shared_ptr<VulkanRenderPass> mRenderPass = nullptr;
-    std::shared_ptr<VulkanSwapChainWrapper> mSwapChain = nullptr;
     std::shared_ptr<VulkanGraphicsPipeline> mPipeline = nullptr;
     std::shared_ptr<VulkanSyncWrapper> mSyncObject = nullptr;
+    std::shared_ptr<VulkanSwapChainWrapper> mSwapChain = nullptr;
 };
 
 #endif  // WORKENGINE_VULKANMANAGER_H
