@@ -7,6 +7,17 @@
 + This is an open-source library written in C++, aimed at learning and communicating by establishing a highly flexible
   game engine.
 
+## Begin
+
+`git clone https://github.com/WeslyWChen/WorldEngine.git` <br>
+`cd WorldEngine`<br>
+`git submodule init` <br>
+`git submodule update` <br><br>
+`mkdir build`<br>
+`cd build`<br>
+`cmake ..`<br>
+`make .`
+
 ## Contribution
 
 If you want to contribute to this project, you can:
