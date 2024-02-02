@@ -5,8 +5,9 @@
 #ifndef WORKENGINE_WORLD_H
 #define WORKENGINE_WORLD_H
 
-#include "WORLDExport.h"
-#include "entt/src/entt/entity/registry.hpp"
+#include <entt/entity/registry.hpp>
+
+#include "WorldExport.h"
 
 namespace World
 {
@@ -14,6 +15,6 @@ namespace World
 
     WORLD_API World* GetWorld();
 
-}  // namespace WORLD
+}  // namespace World
 
 #endif  // WORKENGINE_WORLD_H
