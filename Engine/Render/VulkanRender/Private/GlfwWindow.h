@@ -8,7 +8,6 @@
 #include "Core/Common/ClassMacro.h"
 #include "Render/RenderInterface/IWindow.h"
 #include "VulkanDeviceWrapper.h"
-#include "VulkanDrawHandler.h"
 #include "VulkanInstanceWrapper.h"
 #include "VulkanResource.h"
 
@@ -47,8 +46,6 @@ private:
     int32 mHeight = 600;
     String mWindowName = "Window";
     GLFWwindow* mWindow = nullptr;
-
-    std::unique_ptr<VulkanDrawHandler> mDrawHandler = nullptr;
 };
 
 #endif  // WORKENGINE_GLFWWINDOW_H

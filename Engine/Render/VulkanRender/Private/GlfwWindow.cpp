@@ -13,10 +13,10 @@ using namespace std;
 
 void GlfwWindow::OnFramebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
-    auto app = reinterpret_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    if (!app || !app->mDrawHandler)
+    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
+    if (!pipeline)
         return;
-    app->mDrawHandler->OnWindowResize();
+    VulkanManager::instance()->GetPipelineWrapper()->OnWindowResize();
 }
 
 GlfwWindow::GlfwWindow() {}
@@ -31,7 +31,6 @@ void GlfwWindow::Run()
     if (!mWindow)
         return;
 
-    mDrawHandler = make_unique<VulkanDrawHandler>();
     CheckUpdate();
 
     while (!glfwWindowShouldClose(mWindow))
@@ -41,8 +40,6 @@ void GlfwWindow::Run()
     }
 
     vkDeviceWaitIdle(VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice());
-
-    mDrawHandler = nullptr;
 }
 
 void GlfwWindow::CreateResource()
@@ -80,24 +77,25 @@ void GlfwWindow::SetWindowName(const String& name)
 
 void GlfwWindow::CheckUpdate()
 {
-    if (!mDrawHandler)
+    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
+    if (!pipeline)
         return;
 
     auto world = World::GetWorld();
-
     auto positionView = world->view<MeshComponent>();
     for (const auto& [entityKey, mesh] : positionView.each())
     {
         // test
-        mDrawHandler->OnMeshUpdate(mesh);
+        pipeline->OnMeshUpdate(mesh);
         break;
     }
 }
 
 void GlfwWindow::DrawFrame()
 {
-    if (!mDrawHandler)
+    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
+    if (!pipeline)
         return;
 
-    mDrawHandler->DrawCall();
+    pipeline->DrawCall();
 }
