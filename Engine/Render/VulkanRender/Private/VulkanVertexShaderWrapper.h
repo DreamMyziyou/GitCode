@@ -22,6 +22,8 @@ public:
     const VkPipelineInputAssemblyStateCreateInfo& GetInputAssemblyInfo() const { return mInputAssembly; }
 
 private:
+    VkVertexInputBindingDescription mBindingDescription;
+    std::array<VkVertexInputAttributeDescription, 2> mAttributeDescriptions;
     VkPipelineVertexInputStateCreateInfo mVertexInputCreateInfo;
     VkPipelineInputAssemblyStateCreateInfo mInputAssembly;
 };

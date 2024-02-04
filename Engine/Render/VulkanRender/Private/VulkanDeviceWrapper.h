@@ -30,6 +30,8 @@ public:
 
     std::shared_ptr<VulkanSyncWrapper> GetSyncWrapper() const { return mSyncObject; }
 
+    uint32 FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
 private:
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
     bool IsDeviceSuitable(VkPhysicalDevice device) const;

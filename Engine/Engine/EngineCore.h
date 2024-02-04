@@ -10,5 +10,6 @@
 #include "Core/Common/ClassMacro.h"
 #include "Core/Common/DeleteMacro.h"
 #include "Module/Logger/Logger.h"
+#include "World/World.h"
 
 #endif  // WORKENGINE_ENGINECORE_H

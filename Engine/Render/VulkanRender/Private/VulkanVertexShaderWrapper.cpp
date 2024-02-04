@@ -3,6 +3,8 @@
 //
 #include "VulkanVertexShaderWrapper.h"
 
+#include "GeometryToVulkan.h"
+
 VulkanVertexShaderWrapper::VulkanVertexShaderWrapper()
 {
     mType = VK_SHADER_STAGE_VERTEX_BIT;
@@ -15,12 +17,15 @@ void VulkanVertexShaderWrapper::CreateResource()
 
     VulkanShaderWrapper::CreateResource();
 
+    mBindingDescription = GeometryToVulkan::GetVertexBindingDescription();
+    mAttributeDescriptions = GeometryToVulkan::GetVertexAttributeDescriptions();
+
     mVertexInputCreateInfo = {};
     mVertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    mVertexInputCreateInfo.vertexBindingDescriptionCount = 0;
-    mVertexInputCreateInfo.pVertexBindingDescriptions = nullptr;  // Optional
-    mVertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
-    mVertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;  // Optional
+    mVertexInputCreateInfo.vertexBindingDescriptionCount = 1;
+    mVertexInputCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(mAttributeDescriptions.size());
+    mVertexInputCreateInfo.pVertexBindingDescriptions = &mBindingDescription;
+    mVertexInputCreateInfo.pVertexAttributeDescriptions = mAttributeDescriptions.data();
 
     mInputAssembly = {};
     mInputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

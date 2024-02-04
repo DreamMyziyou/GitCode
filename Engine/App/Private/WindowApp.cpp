@@ -3,7 +3,6 @@
 //
 #include "WindowApp.h"
 
-#include "Render/RenderInterface/RenderComponent.h"
 #include "Render/RenderManager/RenderManager.h"
 
 struct WindowApp::Impl

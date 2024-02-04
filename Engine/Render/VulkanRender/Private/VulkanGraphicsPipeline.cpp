@@ -149,7 +149,7 @@ void VulkanGraphicsPipeline::DestroyResource()
 void VulkanGraphicsPipeline::CreateDefaultShader()
 {
     mVertexShader = make_shared<VulkanVertexShaderWrapper>();
-    mVertexShader->SetShaderPath("Shader/HelloTriangle.vert.spv");
+    mVertexShader->SetShaderPath("Shader/Base.vert.spv");
     mVertexShader->CreateResource();
 
     mFragShader = make_shared<VulkanShaderWrapper>();

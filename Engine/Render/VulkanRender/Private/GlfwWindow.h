@@ -8,6 +8,7 @@
 #include "Core/Common/ClassMacro.h"
 #include "Render/RenderInterface/IWindow.h"
 #include "VulkanDeviceWrapper.h"
+#include "VulkanDrawHandler.h"
 #include "VulkanInstanceWrapper.h"
 #include "VulkanResource.h"
 
@@ -39,7 +40,6 @@ private:
     // temp for check world
     void CheckUpdate();
 
-    void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void DrawFrame();
 
 private:
@@ -48,8 +48,7 @@ private:
     String mWindowName = "Window";
     GLFWwindow* mWindow = nullptr;
 
-    bool mIsResize = false;
-    int mCurrentFrame = 0;
+    std::unique_ptr<VulkanDrawHandler> mDrawHandler = nullptr;
 };
 
 #endif  // WORKENGINE_GLFWWINDOW_H
