@@ -121,14 +121,14 @@ void VulkanGraphicsPipeline::CreateResource()
         return;
     mPipeline = graphicsPipeline;
 
-    mVertexBuffer = make_unique<VertexBuffer>();
+    mMeshBuffer = make_unique<MeshBuffer>();
 }
 
 void VulkanGraphicsPipeline::DestroyResource()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
-    mVertexBuffer = nullptr;
+    mMeshBuffer = nullptr;
 
     if (mPipeline)
     {
@@ -226,10 +226,10 @@ void VulkanGraphicsPipeline::OnWindowResize()
 
 void VulkanGraphicsPipeline::OnMeshUpdate(const MeshComponent& mesh)
 {
-    if (!mVertexShader)
+    if (!mMeshBuffer)
         return;
 
-    mVertexBuffer->OnMeshUpdate(mesh);
+    mMeshBuffer->OnMeshUpdate(mesh);
 }
 
 void VulkanGraphicsPipeline::CreateDefaultShader()
@@ -287,11 +287,13 @@ void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, 
     scissor.extent = swapChainExtent;
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    VkBuffer vertexBuffers[] = {mVertexBuffer->GetBufferHandle()};
+    VkBuffer vertexBuffers[] = {mMeshBuffer->GetVertexBufferHandle()};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+    vkCmdBindIndexBuffer(commandBuffer, mMeshBuffer->GetIndexBufferHandle(), 0, VK_INDEX_TYPE_UINT16);
+
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mMeshBuffer->GetIndexSize()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 

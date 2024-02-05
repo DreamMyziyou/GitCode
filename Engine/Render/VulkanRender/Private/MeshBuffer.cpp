@@ -1,28 +1,28 @@
 //
 // Created by WeslyChen on 2024/2/4.
 //
-#include "VertexBuffer.h"
+#include "MeshBuffer.h"
 
 #include "VulkanManager.h"
 
 using namespace std;
 
-VertexBuffer::~VertexBuffer()
+MeshBuffer::~MeshBuffer()
 {
     ReleaseBuffer();
 }
 
-void VertexBuffer::OnMeshUpdate(const MeshComponent& mesh)
+void MeshBuffer::OnMeshUpdate(const MeshComponent& mesh)
 {
     CreateVertexBuffer(mesh.vertices);
-    if (!mVertexBuffer || !mVertexBufferMemory)
-        return;
+
+    mIndexSize = mesh.indices.size();
+
+    CreateIndexBuffer(mesh.indices);
 }
 
-void VertexBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
+void MeshBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
 {
-    ReleaseBuffer();
-
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
     auto device = deviceWrapper->GetLogicDevice();
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
@@ -41,8 +41,8 @@ void VertexBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
     vkUnmapMemory(device, stagingBufferMemory);
 
     CreateBuffer(bufferSize,
-                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                  mVertexBuffer,
                  mVertexBufferMemory);
 
@@ -52,7 +52,38 @@ void VertexBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void VertexBuffer::CreateBuffer(
+void MeshBuffer::CreateIndexBuffer(const vector<uint16>& indices)
+{
+    auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
+    auto device = deviceWrapper->GetLogicDevice();
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    CreateBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 stagingBuffer,
+                 stagingBufferMemory);
+
+    void* data = nullptr;
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), (size_t)bufferSize);
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    CreateBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                 mIndexBuffer,
+                 mIndexBufferMemory);
+
+    CopyBuffer(stagingBuffer, mIndexBuffer, bufferSize);
+
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+
+void MeshBuffer::CreateBuffer(
         VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
@@ -83,7 +114,7 @@ void VertexBuffer::CreateBuffer(
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void VertexBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void MeshBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
     auto device = deviceWrapper->GetLogicDevice();
@@ -122,7 +153,7 @@ void VertexBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSi
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
-void VertexBuffer::ReleaseBuffer()
+void MeshBuffer::ReleaseBuffer()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
@@ -136,5 +167,17 @@ void VertexBuffer::ReleaseBuffer()
     {
         vkFreeMemory(device, mVertexBufferMemory, nullptr);
         mVertexBufferMemory = nullptr;
+    }
+
+    if (mIndexBuffer)
+    {
+        vkDestroyBuffer(device, mIndexBuffer, nullptr);
+        mIndexBuffer = nullptr;
+    }
+
+    if (mIndexBufferMemory)
+    {
+        vkFreeMemory(device, mIndexBufferMemory, nullptr);
+        mIndexBufferMemory = nullptr;
     }
 }

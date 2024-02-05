@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include "Engine/EngineCore.h"
 #include "GeometryExport.h"
 #include "Vertex.h"
 
@@ -13,6 +14,7 @@ struct MeshComponent
 {
     int dirtyVersion = 0;
     std::vector<Vertex> vertices;
+    std::vector<uint16> indices;
 };
 
 #endif  // WORLDENGINE_MESHCOMPONENT_H

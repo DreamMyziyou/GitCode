@@ -4,7 +4,7 @@
 #ifndef WORKENGINE_VULKANGRAPHICSPIPELINE_H
 #define WORKENGINE_VULKANGRAPHICSPIPELINE_H
 
-#include "VertexBuffer.h"
+#include "MeshBuffer.h"
 #include "VulkanResource.h"
 #include "VulkanVertexShaderWrapper.h"
 
@@ -44,7 +44,7 @@ private:
     bool mIsResize = false;
     int mCurrentFrame = 0;
 
-    std::unique_ptr<VertexBuffer> mVertexBuffer = nullptr;
+    std::unique_ptr<MeshBuffer> mMeshBuffer = nullptr;
 };
 
 #endif  // WORKENGINE_VULKANGRAPHICSPIPELINE_H

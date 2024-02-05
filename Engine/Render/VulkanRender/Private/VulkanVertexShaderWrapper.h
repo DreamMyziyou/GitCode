@@ -4,6 +4,8 @@
 #ifndef WORKENGINE_VULKANVERTEXSHADERWRAPPER_H
 #define WORKENGINE_VULKANVERTEXSHADERWRAPPER_H
 
+#include <array>
+
 #include "VulkanShaderWrapper.h"
 
 class VulkanVertexShaderWrapper final : public VulkanShaderWrapper
