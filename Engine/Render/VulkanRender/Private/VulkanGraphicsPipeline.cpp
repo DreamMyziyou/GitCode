@@ -223,6 +223,7 @@ void VulkanGraphicsPipeline::OnWindowResize()
 {
     mIsResize = true;
 }
+
 void VulkanGraphicsPipeline::OnMeshUpdate(const MeshComponent& mesh)
 {
     if (!mVertexShader)

@@ -21,7 +21,9 @@ public:
     void OnMeshUpdate(const MeshComponent& mesh);
 
 private:
-    void CreateBuffer(const std::vector<Vertex>& vertices);
+    void CreateVertexBuffer(const std::vector<Vertex>& vertices);
+    void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
     void ReleaseBuffer();
 
 private:
