@@ -1,18 +1,24 @@
 //
 // Created by WeslyChen on 2024/2/4.
 //
-#include "MeshBuffer.h"
+#include "ShaderBuffer.h"
 
+#include "UniformBuffer.h"
 #include "VulkanManager.h"
 
 using namespace std;
 
-MeshBuffer::~MeshBuffer()
+ShaderBuffer::ShaderBuffer()
+{
+    CreateUniformBuffers();
+}
+
+ShaderBuffer::~ShaderBuffer()
 {
     ReleaseBuffer();
 }
 
-void MeshBuffer::OnMeshUpdate(const MeshComponent& mesh)
+void ShaderBuffer::OnMeshUpdate(const MeshComponent& mesh)
 {
     CreateVertexBuffer(mesh.vertices);
 
@@ -21,7 +27,7 @@ void MeshBuffer::OnMeshUpdate(const MeshComponent& mesh)
     CreateIndexBuffer(mesh.indices);
 }
 
-void MeshBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
+void ShaderBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
 {
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
     auto device = deviceWrapper->GetLogicDevice();
@@ -52,7 +58,7 @@ void MeshBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void MeshBuffer::CreateIndexBuffer(const vector<uint16>& indices)
+void ShaderBuffer::CreateIndexBuffer(const vector<uint16>& indices)
 {
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
     auto device = deviceWrapper->GetLogicDevice();
@@ -83,7 +89,28 @@ void MeshBuffer::CreateIndexBuffer(const vector<uint16>& indices)
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void MeshBuffer::CreateBuffer(
+void ShaderBuffer::CreateUniformBuffers()
+{
+    auto device = VulkanManager::instance()->GetDevice();
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+    mUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    mUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+    mUniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        CreateBuffer(bufferSize,
+                     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                     mUniformBuffers[i],
+                     mUniformBuffersMemory[i]);
+
+        vkMapMemory(device, mUniformBuffersMemory[i], 0, bufferSize, 0, &mUniformBuffersMapped[i]);
+    }
+}
+
+void ShaderBuffer::CreateBuffer(
         VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
@@ -114,7 +141,7 @@ void MeshBuffer::CreateBuffer(
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void MeshBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void ShaderBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
     auto device = deviceWrapper->GetLogicDevice();
@@ -153,7 +180,7 @@ void MeshBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
-void MeshBuffer::ReleaseBuffer()
+void ShaderBuffer::ReleaseBuffer()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
@@ -180,4 +207,13 @@ void MeshBuffer::ReleaseBuffer()
         vkFreeMemory(device, mIndexBufferMemory, nullptr);
         mIndexBufferMemory = nullptr;
     }
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        vkDestroyBuffer(device, mUniformBuffers[i], nullptr);
+        vkFreeMemory(device, mUniformBuffersMemory[i], nullptr);
+    }
+    mUniformBuffers.clear();
+    mUniformBuffersMemory.clear();
+    mUniformBuffersMapped.clear();
 }

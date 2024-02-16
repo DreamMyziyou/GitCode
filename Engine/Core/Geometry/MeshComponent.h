@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "Engine/EngineCore.h"
-#include "GeometryExport.h"
 #include "Vertex.h"
 
 struct MeshComponent

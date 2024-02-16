@@ -4,7 +4,7 @@
 #ifndef WORKENGINE_VULKANGRAPHICSPIPELINE_H
 #define WORKENGINE_VULKANGRAPHICSPIPELINE_H
 
-#include "MeshBuffer.h"
+#include "ShaderBuffer.h"
 #include "VulkanResource.h"
 #include "VulkanVertexShaderWrapper.h"
 
@@ -29,22 +29,27 @@ public:
     void OnMeshUpdate(const MeshComponent& mesh);
 
 private:
-    // Temp for test
     void CreateDefaultShader();
+    void CreateDescriptorPool();
+    void CreateDescriptorSets();
+    void CreateDescriptorSetLayout();
 
     void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+    void UpdateUniformBuffer(uint32_t currentImage);
 
 private:
+    VkDescriptorPool mDescriptorPool = nullptr;
+    VkDescriptorSetLayout mDescriptorSetLayout = nullptr;
+    std::vector<VkDescriptorSet> mDescriptorSets;
     VkPipelineLayout mPipelineLayout = nullptr;
     VkPipeline mPipeline = nullptr;
 
+    std::unique_ptr<ShaderBuffer> mShaderBuffer = nullptr;
     std::shared_ptr<VulkanVertexShaderWrapper> mVertexShader = nullptr;
     std::shared_ptr<VulkanShaderWrapper> mFragShader = nullptr;
 
     bool mIsResize = false;
     int mCurrentFrame = 0;
-
-    std::unique_ptr<MeshBuffer> mMeshBuffer = nullptr;
 };
 
 #endif  // WORKENGINE_VULKANGRAPHICSPIPELINE_H
