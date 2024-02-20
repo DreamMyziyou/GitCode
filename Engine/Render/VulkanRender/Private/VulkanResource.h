@@ -16,7 +16,7 @@
 #include <optional>
 #include <vector>
 
-#include "Core/Engine/EngineCore.h"
+#include "Core/Engine/Engine.h"
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
