@@ -30,6 +30,8 @@ If you want to contribute to this project, you can:
 
 ## TODO
 
++ engine目录结构整理
++ 基于ECS机制的资源自动回收机制
 + 2D Geometry
 + tile and dirty area
 + quad tree
