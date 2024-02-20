@@ -5,7 +5,7 @@
 #ifndef WORKENGINE_SIGNALCENTERMODULE_H
 #define WORKENGINE_SIGNALCENTERMODULE_H
 
-#include "Module/ModuleCore/ModuleSingleton.h"
+#include "Core/ModuleCore/ModuleSingleton.h"
 #include "SignalCenter.h"
 
 class SignalCenterModule final : public ModuleCore::IModule, public SignalCenter::ICenter

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Module/Logger/Logger.h"
+#include "Core/Logger/Logger.h"
 
 TEST(Logger, output)
 {

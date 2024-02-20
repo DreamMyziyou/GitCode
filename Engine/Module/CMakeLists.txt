@@ -1,3 +1,0 @@
-add_subdirectory(Logger)
-add_subdirectory(ModuleCore)
-add_subdirectory(SignalCenter)

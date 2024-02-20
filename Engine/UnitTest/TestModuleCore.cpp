@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Module/ModuleCore/ModuleSingleton.h"
+#include "Core/ModuleCore/ModuleSingleton.h"
 
 static int gStackCount = 0;
 

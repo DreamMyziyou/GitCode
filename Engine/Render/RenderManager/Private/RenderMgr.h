@@ -5,7 +5,7 @@
 #ifndef WORKENGINE_RENDERMGR_H
 #define WORKENGINE_RENDERMGR_H
 
-#include "Module/ModuleCore/ModuleSingleton.h"
+#include "Core/ModuleCore/ModuleSingleton.h"
 #include "RenderManager.h"
 
 class RenderMgr final : public ModuleCore::IModule, public RenderManager::IManager

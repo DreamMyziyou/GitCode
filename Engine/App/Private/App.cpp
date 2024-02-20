@@ -4,8 +4,8 @@
 
 #include "App.h"
 
-#include "Module/Logger/Logger.h"
-#include "Module/ModuleCore/ModuleCore.h"
+#include "Core/Logger/Logger.h"
+#include "Core/ModuleCore/ModuleCore.h"
 
 App::App()
 {

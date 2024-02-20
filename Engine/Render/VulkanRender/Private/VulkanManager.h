@@ -9,7 +9,7 @@
 #include <stack>
 
 #include "GlfwWindow.h"
-#include "Module/ModuleCore/ModuleSingleton.h"
+#include "Core/ModuleCore/ModuleSingleton.h"
 #include "VulkanDeviceWrapper.h"
 #include "VulkanGraphicsPipeline.h"
 #include "VulkanInstanceWrapper.h"

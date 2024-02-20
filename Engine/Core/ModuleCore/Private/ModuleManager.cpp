@@ -6,7 +6,7 @@
 
 #include <format>
 
-#include "Module/Logger/Logger.h"
+#include "Core/Logger/Logger.h"
 
 void ModuleManager::RegisterModule(ModuleCore::IModule* module)
 {

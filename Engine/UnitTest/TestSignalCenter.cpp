@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Module/SignalCenter/SignalCenter.h"
+#include "Core/SignalCenter/SignalCenter.h"
 
 TEST(SignalCenter, SigToConn)
 {
