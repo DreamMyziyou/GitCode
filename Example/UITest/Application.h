@@ -6,7 +6,7 @@
 #define WORKENGINE_APPLICATION_H
 
 #include "App/WindowApp.h"
-#include "Core/Engine/Engine.h"
+#include "Engine.h"
 
 class Application final : public WindowApp
 {

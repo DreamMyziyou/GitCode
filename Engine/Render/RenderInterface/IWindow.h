@@ -5,7 +5,7 @@
 #ifndef WORKENGINE_IWINDOW_H
 #define WORKENGINE_IWINDOW_H
 
-#include "Core/Engine/Engine.h"
+#include "Engine.h"
 
 namespace Render
 {

@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "World/World.h"
+#include "Core/World/World.h"
 
 TEST(World, ECS)
 {

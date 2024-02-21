@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "Core/Engine/Engine.h"
+#include "Engine.h"
 #include "Vertex.h"
 
 struct MeshComponent
