@@ -5,7 +5,6 @@
 #include "GlfwWindow.h"
 
 #include "Core/Geometry/MeshComponent.h"
-#include "Core/Logger/Logger.h"
 #include "Core/World/World.h"
 #include "GlfwWindowSystem.h"
 #include "VulkanManager.h"
