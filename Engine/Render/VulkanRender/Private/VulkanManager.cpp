@@ -4,6 +4,8 @@
 
 #include "VulkanManager.h"
 
+#include "GlfwWindowSystem.h"
+
 using namespace std;
 
 void VulkanManager::StartupModule() {}
@@ -18,6 +20,8 @@ void VulkanManager::ShutdownModule()
     }
 
     glfwTerminate();
+
+    mMainWindow = nullptr;
 }
 
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
@@ -25,13 +29,7 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
     if (mMainWindow != nullptr)
         return mMainWindow.get();
 
-    glfwInit();
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
     mMainWindow = make_shared<GlfwWindow>();
-    mMainWindow->SetWH(width, height);
-    mMainWindow->SetWindowName(title);
-    InitResource(mMainWindow);
 
     mInstance = make_shared<VulkanInstanceWrapper>();
     InitResource(mInstance);
@@ -56,7 +54,7 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
 
 void VulkanManager::ReCreateSwapChain()
 {
-    auto window = GetWindow();
+    auto window = GlfwWindowSystem::QueryGlfwWindowHandle();
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
     while (width == 0 || height == 0)

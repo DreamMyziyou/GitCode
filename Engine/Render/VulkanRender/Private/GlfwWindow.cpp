@@ -6,73 +6,38 @@
 
 #include "Core/Geometry/MeshComponent.h"
 #include "Core/Logger/Logger.h"
-#include "VulkanManager.h"
 #include "Core/World/World.h"
+#include "GlfwWindowSystem.h"
+#include "VulkanManager.h"
 
 using namespace std;
 
-void GlfwWindow::OnFramebufferResizeCallback(GLFWwindow* window, int width, int height)
+GlfwWindow::GlfwWindow()
 {
-    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
-    if (!pipeline)
-        return;
-    VulkanManager::instance()->GetPipelineWrapper()->OnWindowResize();
+    GlfwWindowSystem::InitResource();
 }
-
-GlfwWindow::GlfwWindow() {}
 
 GlfwWindow::~GlfwWindow()
 {
-    DestroyResource();
+    GlfwWindowSystem::ReleaseResource();
 }
 
 void GlfwWindow::Run()
 {
-    if (!mWindow)
+    auto pWindowComponent = GlfwWindowSystem::QueryGlfwWindowComponent();
+
+    if (!pWindowComponent || !pWindowComponent->window)
         return;
 
     CheckUpdate();
 
-    while (!glfwWindowShouldClose(mWindow))
+    while (!glfwWindowShouldClose(pWindowComponent->window))
     {
         glfwPollEvents();
         DrawFrame();
     }
 
     vkDeviceWaitIdle(VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice());
-}
-
-void GlfwWindow::CreateResource()
-{
-    if (mWindow != nullptr)
-        return;
-
-    Logger::Log(Logger::Level::Info, "VulkanRender", "Create GlfwWindow.");
-    mWindow = glfwCreateWindow(mWidth, mHeight, mWindowName.c_str(), nullptr, nullptr);
-
-    glfwSetWindowUserPointer(mWindow, this);
-    glfwSetFramebufferSizeCallback(mWindow, OnFramebufferResizeCallback);
-}
-
-void GlfwWindow::DestroyResource()
-{
-    if (nullptr == mWindow)
-        return;
-
-    glfwDestroyWindow(mWindow);
-    mWindow = nullptr;
-    Logger::Log(Logger::Level::Info, "VulkanRender", "Destroy GlfwWindow.");
-}
-
-void GlfwWindow::SetWH(int32 width, int32 height)
-{
-    mWidth = width;
-    mHeight = height;
-}
-
-void GlfwWindow::SetWindowName(const String& name)
-{
-    mWindowName = name;
 }
 
 void GlfwWindow::CheckUpdate()

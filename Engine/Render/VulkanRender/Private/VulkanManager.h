@@ -27,7 +27,6 @@ public:
     void ShutdownModule() override;
 
 public:
-    GLFWwindow* GetWindow() const { return mMainWindow->GetWindow(); }
     VkInstance GetVulkanInstance() const { return mInstance->GetVulkanInstance(); }
     VkDevice GetDevice() const { return mDevice->GetLogicDevice(); }
     VkRenderPass GetRenderPass() const { return mRenderPass->GetRenderPass(); }

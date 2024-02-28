@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 
+#include "GlfwWindowSystem.h"
 #include "VulkanManager.h"
 
 using namespace std;
@@ -14,7 +15,7 @@ void VulkanSurfaceWrapper::CreateResource()
 {
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    createInfo.hwnd = glfwGetWin32Window(VulkanManager::instance()->GetWindow());
+    createInfo.hwnd = glfwGetWin32Window(GlfwWindowSystem::QueryGlfwWindowHandle());
     createInfo.hinstance = GetModuleHandle(nullptr);
 
     VkSurfaceKHR surface = nullptr;
