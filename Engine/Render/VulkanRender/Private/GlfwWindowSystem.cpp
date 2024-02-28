@@ -62,6 +62,8 @@ void GlfwWindowSystem::ReleaseResource()
 
     glfwDestroyWindow(windowComponent->window);
     world.destroy(windowEntity);
+
+    glfwTerminate();
 }
 
 void GlfwWindowSystem::OnFramebufferResize(GLFWwindow* window, int width, int height)

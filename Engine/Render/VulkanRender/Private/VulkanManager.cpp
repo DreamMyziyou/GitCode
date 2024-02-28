@@ -19,8 +19,6 @@ void VulkanManager::ShutdownModule()
         mResourceStack.pop();
     }
 
-    glfwTerminate();
-
     mMainWindow = nullptr;
 }
 
