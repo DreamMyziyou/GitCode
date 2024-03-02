@@ -14,4 +14,10 @@ struct GlfwWindowComponent
     GLFWwindow* window = nullptr;
 };
 
+struct WindowResizeComponent
+{
+    int32 width = 0;
+    int32 height = 0;
+};
+
 #endif  // WORLDENGINE_GLFWWINDOWCOMPONENT_H

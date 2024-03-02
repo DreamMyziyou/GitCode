@@ -25,7 +25,6 @@ public:
 
     void DrawCall();
 
-    void OnWindowResize();
     void OnMeshUpdate(const MeshComponent& mesh);
 
 private:
@@ -48,7 +47,6 @@ private:
     std::shared_ptr<VulkanVertexShaderWrapper> mVertexShader = nullptr;
     std::shared_ptr<VulkanShaderWrapper> mFragShader = nullptr;
 
-    bool mIsResize = false;
     int mCurrentFrame = 0;
 };
 

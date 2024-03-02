@@ -68,9 +68,21 @@ void GlfwWindowSystem::ReleaseResource()
 
 void GlfwWindowSystem::OnFramebufferResize(GLFWwindow* window, int width, int height)
 {
-    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
-    if (!pipeline)
+    auto& world = VulkanResourceCenter::instance()->world;
+    auto view = world.view<GlfwWindowComponent>();
+    if (view.empty())
         return;
 
-    VulkanManager::instance()->GetPipelineWrapper()->OnWindowResize();
+    auto windowEntity = *view.begin();
+    if (auto resizeComponent = world.try_get<WindowResizeComponent>(windowEntity); resizeComponent)
+    {
+        resizeComponent->width = width;
+        resizeComponent->height = height;
+    }
+    else
+    {
+        auto& newResizeComponent = world.emplace<WindowResizeComponent>(windowEntity);
+        newResizeComponent.width = width;
+        newResizeComponent.height = height;
+    }
 }

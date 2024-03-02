@@ -9,8 +9,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "GlfwWindowSystem.h"
 #include "UniformBuffer.h"
 #include "VulkanManager.h"
+#include "VulkanResourceCenter.h"
 
 using namespace std;
 
@@ -233,19 +235,16 @@ void VulkanGraphicsPipeline::DrawCall()
     presentInfo.pImageIndices = &imageIndex;
     result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || mIsResize)
+    auto view = VulkanResourceCenter::instance()->world.view<WindowResizeComponent>();
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || !view.empty())
     {
-        mIsResize = false;
+        for (const auto& entity : view)
+            VulkanResourceCenter::instance()->world.remove<WindowResizeComponent>(entity);
         VulkanManager::instance()->ReCreateSwapChain();
         return;
     }
 
     mCurrentFrame = (mCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-}
-
-void VulkanGraphicsPipeline::OnWindowResize()
-{
-    mIsResize = true;
 }
 
 void VulkanGraphicsPipeline::OnMeshUpdate(const MeshComponent& mesh)
