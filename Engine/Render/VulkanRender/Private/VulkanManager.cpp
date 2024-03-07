@@ -54,6 +54,9 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
 
 void VulkanManager::ReCreateSwapChain()
 {
+    if (VulkanResourceCenter::instance()->windowEntity == entt::null)
+        return;
+
     auto window = mMainWindow->QueryGlfwWindowHandle();
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);

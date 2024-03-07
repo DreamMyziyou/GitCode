@@ -11,6 +11,10 @@
 class GlfwWindowSystem final : public IVulkanSubSystem, public Render::IMainWindow
 {
 public:
+    static GlfwWindowComponent* QueryGlfwWindowComponent();
+    static GLFWwindow* QueryGlfwWindowHandle();
+
+public:
     GlfwWindowSystem() = default;
     ~GlfwWindowSystem() override = default;
     GlfwWindowSystem(const GlfwWindowSystem&) = delete;
@@ -24,9 +28,7 @@ public:
 public:
     void Run() override;
 
-public:
-    static GlfwWindowComponent* QueryGlfwWindowComponent();
-    static GLFWwindow* QueryGlfwWindowHandle();
+private:
     static void OnFramebufferResize(GLFWwindow* window, int width, int height);
 
 private:
