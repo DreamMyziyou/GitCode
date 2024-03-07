@@ -6,7 +6,7 @@
 
 #include "VulkanResource.h"
 
-class VulkanSyncWrapper final : public IVulkanResource
+class VulkanSyncWrapper final : public IVulkanSubSystem
 {
 public:
     VulkanSyncWrapper() = default;
@@ -15,8 +15,9 @@ public:
     VulkanSyncWrapper& operator=(const VulkanSyncWrapper&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkSemaphore GetImageAvailableSemaphore(int index) const { return mImageAvailableSemaphores[index]; }

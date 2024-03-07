@@ -10,12 +10,12 @@ VulkanVertexShaderWrapper::VulkanVertexShaderWrapper()
     mType = VK_SHADER_STAGE_VERTEX_BIT;
 }
 
-void VulkanVertexShaderWrapper::CreateResource()
+void VulkanVertexShaderWrapper::OnInit()
 {
     if (mShader)
         return;
 
-    VulkanShaderWrapper::CreateResource();
+    VulkanShaderWrapper::OnInit();
 
     mBindingDescription = GeometryToVulkan::GetVertexBindingDescription();
     mAttributeDescriptions = GeometryToVulkan::GetVertexAttributeDescriptions();

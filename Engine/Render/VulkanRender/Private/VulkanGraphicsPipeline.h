@@ -8,7 +8,7 @@
 #include "VulkanResource.h"
 #include "VulkanVertexShaderWrapper.h"
 
-class VulkanGraphicsPipeline final : public IVulkanResource
+class VulkanGraphicsPipeline final : public IVulkanSubSystem
 {
 public:
     VulkanGraphicsPipeline() = default;
@@ -17,8 +17,9 @@ public:
     VulkanGraphicsPipeline& operator=(const VulkanGraphicsPipeline&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkPipeline GetPipeline() const { return mPipeline; }

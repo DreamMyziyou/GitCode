@@ -7,7 +7,7 @@
 
 #include "VulkanResource.h"
 
-class VulkanInstanceWrapper final : public IVulkanResource
+class VulkanInstanceWrapper final : public IVulkanSubSystem
 {
 public:
     VulkanInstanceWrapper() = default;
@@ -16,8 +16,9 @@ public:
     VulkanInstanceWrapper& operator=(const VulkanInstanceWrapper&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkInstance GetVulkanInstance() const { return mInstance; }

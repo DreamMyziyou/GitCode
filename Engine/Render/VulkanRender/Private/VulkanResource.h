@@ -16,16 +16,27 @@
 #include <optional>
 #include <vector>
 
+#include "Core/World/World.h"
 #include "Engine.h"
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-struct IVulkanResource
+struct IVulkanSubSystem
 {
-    virtual ~IVulkanResource() = default;
+    virtual ~IVulkanSubSystem() = default;
 
-    virtual void CreateResource() = 0;
-    virtual void DestroyResource() = 0;
+    virtual void OnInit() = 0;
+    virtual void OnDestroy() = 0;
+    virtual void OnUpdate() = 0;
+};
+
+class VulkanResourceCenter final
+{
+    SINGLETON_CLASS(VulkanResourceCenter)
+
+    entt::registry world;
+
+    entt::entity windowEntity = entt::null;
 };
 
 #endif  // WORKENGINE_VULKANRESOURCE_H

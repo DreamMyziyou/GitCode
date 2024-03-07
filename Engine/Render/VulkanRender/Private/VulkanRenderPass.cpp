@@ -5,7 +5,7 @@
 
 #include "VulkanManager.h"
 
-void VulkanRenderPass::CreateResource()
+void VulkanRenderPass::OnInit()
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VulkanManager::instance()->GetSurfaceWrapper()->GetExpectSurfaceFormat().format;
@@ -40,7 +40,7 @@ void VulkanRenderPass::CreateResource()
     mRenderPass = renderPass;
 }
 
-void VulkanRenderPass::DestroyResource()
+void VulkanRenderPass::OnDestroy()
 {
     if (nullptr == mRenderPass)
         return;
@@ -48,3 +48,5 @@ void VulkanRenderPass::DestroyResource()
     vkDestroyRenderPass(VulkanManager::instance()->GetDevice(), mRenderPass, nullptr);
     mRenderPass = nullptr;
 }
+
+void VulkanRenderPass::OnUpdate() {}

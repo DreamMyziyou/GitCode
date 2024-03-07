@@ -17,7 +17,7 @@ public:
     VulkanVertexShaderWrapper& operator=(const VulkanVertexShaderWrapper&) = delete;
 
 public:
-    void CreateResource() override;
+    void OnInit() override;
 
 public:
     const VkPipelineVertexInputStateCreateInfo& GetVertexInputInfo() const { return mVertexInputCreateInfo; }

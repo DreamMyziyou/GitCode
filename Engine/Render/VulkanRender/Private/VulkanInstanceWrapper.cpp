@@ -24,7 +24,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
-void VulkanInstanceWrapper::CreateResource()
+void VulkanInstanceWrapper::OnInit()
 {
     // app info
     VkApplicationInfo appInfo{};
@@ -88,7 +88,7 @@ void VulkanInstanceWrapper::CreateResource()
     CheckInstanceExtension();
 }
 
-void VulkanInstanceWrapper::DestroyResource()
+void VulkanInstanceWrapper::OnDestroy()
 {
     if (!mInstance)
         return;
@@ -104,6 +104,8 @@ void VulkanInstanceWrapper::DestroyResource()
     mInstance = nullptr;
     Logger::LogInfo("VulkanRender", "Uninit Vulkan.");
 }
+
+void VulkanInstanceWrapper::OnUpdate() {}
 
 void VulkanInstanceWrapper::CheckInstanceExtension() const
 {

@@ -9,14 +9,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "GlfwWindowSystem.h"
 #include "UniformBuffer.h"
 #include "VulkanManager.h"
-#include "VulkanResourceCenter.h"
 
 using namespace std;
 
-void VulkanGraphicsPipeline::CreateResource()
+void VulkanGraphicsPipeline::OnInit()
 {
     mShaderBuffer = make_unique<ShaderBuffer>();
     CreateDefaultShader();
@@ -136,7 +134,7 @@ void VulkanGraphicsPipeline::CreateResource()
     mPipeline = graphicsPipeline;
 }
 
-void VulkanGraphicsPipeline::DestroyResource()
+void VulkanGraphicsPipeline::OnDestroy()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
@@ -148,13 +146,13 @@ void VulkanGraphicsPipeline::DestroyResource()
 
     if (mVertexShader)
     {
-        mVertexShader->DestroyResource();
+        mVertexShader->OnDestroy();
         mVertexShader = nullptr;
     }
 
     if (mFragShader)
     {
-        mFragShader->DestroyResource();
+        mFragShader->OnDestroy();
         mFragShader = nullptr;
     }
 
@@ -178,6 +176,8 @@ void VulkanGraphicsPipeline::DestroyResource()
 
     mShaderBuffer = nullptr;
 }
+
+void VulkanGraphicsPipeline::OnUpdate() {}
 
 void VulkanGraphicsPipeline::DrawCall()
 {
@@ -259,12 +259,12 @@ void VulkanGraphicsPipeline::CreateDefaultShader()
 {
     mVertexShader = make_shared<VulkanVertexShaderWrapper>();
     mVertexShader->SetShaderPath("Shader/Base.vert.spv");
-    mVertexShader->CreateResource();
+    mVertexShader->OnInit();
 
     mFragShader = make_shared<VulkanShaderWrapper>();
     mFragShader->SetShaderType(VK_SHADER_STAGE_FRAGMENT_BIT);
     mFragShader->SetShaderPath("Shader/Base.frag.spv");
-    mFragShader->CreateResource();
+    mFragShader->OnInit();
 }
 
 void VulkanGraphicsPipeline::CreateDescriptorPool()

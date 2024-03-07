@@ -6,7 +6,7 @@
 
 #include "VulkanResource.h"
 
-class VulkanSurfaceWrapper final : public IVulkanResource
+class VulkanSurfaceWrapper final : public IVulkanSubSystem
 {
 public:
     VulkanSurfaceWrapper() = default;
@@ -15,8 +15,9 @@ public:
     VulkanSurfaceWrapper& operator=(const VulkanSurfaceWrapper&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkSurfaceKHR GetSurface() const { return mSurface; }

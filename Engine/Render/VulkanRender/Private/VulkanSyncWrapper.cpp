@@ -5,7 +5,7 @@
 
 #include "VulkanManager.h"
 
-void VulkanSyncWrapper::CreateResource()
+void VulkanSyncWrapper::OnInit()
 {
     mImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     mRenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -36,7 +36,7 @@ void VulkanSyncWrapper::CreateResource()
     }
 }
 
-void VulkanSyncWrapper::DestroyResource()
+void VulkanSyncWrapper::OnDestroy()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
@@ -52,3 +52,5 @@ void VulkanSyncWrapper::DestroyResource()
         vkDestroyFence(device, item, nullptr);
     mInFlightFences.clear();
 }
+
+void VulkanSyncWrapper::OnUpdate() {}

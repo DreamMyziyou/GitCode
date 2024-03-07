@@ -8,7 +8,7 @@
 #include "VulkanResource.h"
 #include "VulkanSyncWrapper.h"
 
-class VulkanDeviceWrapper final : public IVulkanResource
+class VulkanDeviceWrapper final : public IVulkanSubSystem
 {
 public:
     VulkanDeviceWrapper() = default;
@@ -17,8 +17,9 @@ public:
     VulkanDeviceWrapper& operator=(const VulkanDeviceWrapper&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkPhysicalDevice GetPhysicalDevice() const { return mPhysicalDevice; }

@@ -6,12 +6,11 @@
 #include <algorithm>
 #include <limits>
 
-#include "GlfwWindowSystem.h"
 #include "VulkanManager.h"
 
 using namespace std;
 
-void VulkanSurfaceWrapper::CreateResource()
+void VulkanSurfaceWrapper::OnInit()
 {
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -25,7 +24,7 @@ void VulkanSurfaceWrapper::CreateResource()
         mSurface = surface;
 }
 
-void VulkanSurfaceWrapper::DestroyResource()
+void VulkanSurfaceWrapper::OnDestroy()
 {
     if (nullptr == mSurface)
         return;
@@ -33,6 +32,8 @@ void VulkanSurfaceWrapper::DestroyResource()
     vkDestroySurfaceKHR(VulkanManager::instance()->GetVulkanInstance(), mSurface, nullptr);
     mSurface = nullptr;
 }
+
+void VulkanSurfaceWrapper::OnUpdate() {}
 
 VulkanSurfaceWrapper::QueueFamilyIndices VulkanSurfaceWrapper::FindQueueFamilies(VkPhysicalDevice device)
 {

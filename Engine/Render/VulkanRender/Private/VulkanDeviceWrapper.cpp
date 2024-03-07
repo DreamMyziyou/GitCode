@@ -15,22 +15,22 @@ using namespace std;
 
 static const vector<const char*> gDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-void VulkanDeviceWrapper::CreateResource()
+void VulkanDeviceWrapper::OnInit()
 {
     CreatePhysicalDevice();
     CreateLogicDevice();
     CreateCommand();
 
     mSyncObject = make_shared<VulkanSyncWrapper>();
-    mSyncObject->CreateResource();
+    mSyncObject->OnInit();
 }
 
-void VulkanDeviceWrapper::DestroyResource()
+void VulkanDeviceWrapper::OnDestroy()
 {
     if (nullptr == mSyncObject)
         return;
 
-    mSyncObject->DestroyResource();
+    mSyncObject->OnDestroy();
     mSyncObject = nullptr;
 
     vkDestroyCommandPool(mLogicDevice, mCommandPool, nullptr);
@@ -39,6 +39,8 @@ void VulkanDeviceWrapper::DestroyResource()
     vkDestroyDevice(mLogicDevice, nullptr);
     mLogicDevice = nullptr;
 }
+
+void VulkanDeviceWrapper::OnUpdate() {}
 
 uint32 VulkanDeviceWrapper::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {

@@ -5,19 +5,35 @@
 #define WORLDENGINE_GLFWWINDOWSYSTEM_H
 
 #include "GlfwWindowComponent.h"
+#include "Render/RenderInterface/IWindow.h"
 #include "VulkanResource.h"
 
-class GlfwWindowSystem
+class GlfwWindowSystem final : public IVulkanSubSystem, public Render::IMainWindow
 {
+public:
+    GlfwWindowSystem() = default;
+    ~GlfwWindowSystem() override = default;
+    GlfwWindowSystem(const GlfwWindowSystem&) = delete;
+    GlfwWindowSystem& operator=(const GlfwWindowSystem&) = delete;
+
+public:
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
+
+public:
+    void Run() override;
+
 public:
     static GlfwWindowComponent* QueryGlfwWindowComponent();
     static GLFWwindow* QueryGlfwWindowHandle();
-
-    static void InitResource();
-    static void ReleaseResource();
+    static void OnFramebufferResize(GLFWwindow* window, int width, int height);
 
 private:
-    static void OnFramebufferResize(GLFWwindow* window, int width, int height);
+    // temp for check world
+    void CheckUpdate();
+
+    void DrawFrame();
 };
 
 #endif  // WORLDENGINE_GLFWWINDOWSYSTEM_H

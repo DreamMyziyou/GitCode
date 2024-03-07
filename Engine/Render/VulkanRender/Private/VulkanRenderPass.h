@@ -6,7 +6,7 @@
 
 #include "VulkanResource.h"
 
-class VulkanRenderPass final : public IVulkanResource
+class VulkanRenderPass final : public IVulkanSubSystem
 {
 public:
     VulkanRenderPass() = default;
@@ -15,8 +15,9 @@ public:
     VulkanRenderPass& operator=(const VulkanRenderPass&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkRenderPass GetRenderPass() const { return mRenderPass; }

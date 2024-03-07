@@ -6,7 +6,7 @@
 
 #include "VulkanResource.h"
 
-class VulkanShaderWrapper : IVulkanResource
+class VulkanShaderWrapper : IVulkanSubSystem
 {
 public:
     static constexpr const char* DEFAULT_SHADER_MAIN_NAME = "main";
@@ -18,8 +18,9 @@ public:
     VulkanShaderWrapper& operator=(const VulkanShaderWrapper&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     const VkPipelineShaderStageCreateInfo& GetShaderCreateInfo() const { return mShaderCreateInfo; }

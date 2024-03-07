@@ -4,19 +4,41 @@
 
 #include "VulkanManager.h"
 
-#include "GlfwWindowSystem.h"
-
 using namespace std;
 
-void VulkanManager::StartupModule() {}
+void VulkanManager::StartupModule()
+{
+    ShutdownModule();
+
+    mMainWindow = make_shared<GlfwWindowSystem>();
+    mSystemStack.push_back(mMainWindow);
+
+    mInstance = make_shared<VulkanInstanceWrapper>();
+    mSystemStack.push_back(mInstance);
+
+    mSurface = make_shared<VulkanSurfaceWrapper>();
+    mSystemStack.push_back(mSurface);
+
+    mDevice = make_shared<VulkanDeviceWrapper>();
+    mSystemStack.push_back(mDevice);
+
+    mRenderPass = make_shared<VulkanRenderPass>();
+    mSystemStack.push_back(mRenderPass);
+
+    mPipeline = make_shared<VulkanGraphicsPipeline>();
+    mSystemStack.push_back(mPipeline);
+
+    mSwapChain = make_shared<VulkanSwapChainWrapper>();
+    mSystemStack.push_back(mSwapChain);
+}
 
 void VulkanManager::ShutdownModule()
 {
-    while (!mResourceStack.empty())
+    while (!mSystemStack.empty())
     {
-        auto resource = mResourceStack.top();
-        resource->DestroyResource();
-        mResourceStack.pop();
+        auto resource = mSystemStack.back();
+        resource->OnDestroy();
+        mSystemStack.pop_back();
     }
 
     mMainWindow = nullptr;
@@ -24,35 +46,15 @@ void VulkanManager::ShutdownModule()
 
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
 {
-    if (mMainWindow != nullptr)
-        return mMainWindow.get();
-
-    mMainWindow = make_shared<GlfwWindow>();
-
-    mInstance = make_shared<VulkanInstanceWrapper>();
-    InitResource(mInstance);
-
-    mSurface = make_shared<VulkanSurfaceWrapper>();
-    InitResource(mSurface);
-
-    mDevice = make_shared<VulkanDeviceWrapper>();
-    InitResource(mDevice);
-
-    mRenderPass = make_shared<VulkanRenderPass>();
-    InitResource(mRenderPass);
-
-    mPipeline = make_shared<VulkanGraphicsPipeline>();
-    InitResource(mPipeline);
-
-    mSwapChain = make_shared<VulkanSwapChainWrapper>();
-    InitResource(mSwapChain);
+    for (const auto& subSystem : mSystemStack)
+        subSystem->OnInit();
 
     return mMainWindow.get();
 }
 
 void VulkanManager::ReCreateSwapChain()
 {
-    auto window = GlfwWindowSystem::QueryGlfwWindowHandle();
+    auto window = mMainWindow->QueryGlfwWindowHandle();
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
     while (width == 0 || height == 0)
@@ -64,15 +66,6 @@ void VulkanManager::ReCreateSwapChain()
     vkDeviceWaitIdle(GetDevice());
 
     mSurface->OnUpdate(mDevice->GetPhysicalDevice());
-    mSwapChain->DestroyResource();
-    mSwapChain->CreateResource();
-}
-
-void VulkanManager::InitResource(std::shared_ptr<IVulkanResource> resource)
-{
-    if (nullptr == resource)
-        return;
-
-    resource->CreateResource();
-    mResourceStack.push(resource);
+    mSwapChain->OnDestroy();
+    mSwapChain->OnInit();
 }

@@ -7,7 +7,7 @@
 
 #include "VulkanResource.h"
 
-class VulkanSwapChainWrapper final : public IVulkanResource
+class VulkanSwapChainWrapper final : public IVulkanSubSystem
 {
 public:
     VulkanSwapChainWrapper() = default;
@@ -16,8 +16,9 @@ public:
     VulkanSwapChainWrapper& operator=(const VulkanSwapChainWrapper&) = delete;
 
 public:
-    void CreateResource() override;
-    void DestroyResource() override;
+    void OnInit() override;
+    void OnDestroy() override;
+    void OnUpdate() override;
 
 public:
     VkSwapchainKHR GetSwapChain() const { return mSwapChain; }

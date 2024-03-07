@@ -8,14 +8,14 @@
 
 using namespace std;
 
-void VulkanSwapChainWrapper::CreateResource()
+void VulkanSwapChainWrapper::OnInit()
 {
     CreateSwapChain();
     CreateImageViews();
     CreateFrameBuffers();
 }
 
-void VulkanSwapChainWrapper::DestroyResource()
+void VulkanSwapChainWrapper::OnDestroy()
 {
     auto device = VulkanManager::instance()->GetDevice();
 
@@ -32,6 +32,8 @@ void VulkanSwapChainWrapper::DestroyResource()
     vkDestroySwapchainKHR(device, mSwapChain, nullptr);
     mSwapChain = nullptr;
 }
+
+void VulkanSwapChainWrapper::OnUpdate() {}
 
 void VulkanSwapChainWrapper::CreateSwapChain()
 {

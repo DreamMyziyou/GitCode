@@ -6,10 +6,10 @@
 #define WORKENGINE_VULKANMANAGER_H
 
 #include <memory>
-#include <stack>
+#include <vector>
 
-#include "GlfwWindow.h"
 #include "Core/ModuleCore/ModuleSingleton.h"
+#include "GlfwWindowSystem.h"
 #include "VulkanDeviceWrapper.h"
 #include "VulkanGraphicsPipeline.h"
 #include "VulkanInstanceWrapper.h"
@@ -40,12 +40,9 @@ public:
     void ReCreateSwapChain();
 
 private:
-    void InitResource(std::shared_ptr<IVulkanResource> resource);
+    std::vector<std::shared_ptr<IVulkanSubSystem>> mSystemStack;
 
-private:
-    std::stack<std::shared_ptr<IVulkanResource>> mResourceStack;
-
-    std::shared_ptr<GlfwWindow> mMainWindow = nullptr;
+    std::shared_ptr<GlfwWindowSystem> mMainWindow = nullptr;
     std::shared_ptr<VulkanInstanceWrapper> mInstance = nullptr;
     std::shared_ptr<VulkanSurfaceWrapper> mSurface = nullptr;
     std::shared_ptr<VulkanDeviceWrapper> mDevice = nullptr;

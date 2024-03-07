@@ -2,13 +2,14 @@
 // Created by WeslyChen on 2024/1/28.
 //
 #include "VulkanShaderWrapper.h"
-#include "VulkanManager.h"
 
 #include <fstream>
 
+#include "VulkanManager.h"
+
 using namespace std;
 
-void VulkanShaderWrapper::CreateResource()
+void VulkanShaderWrapper::OnInit()
 {
     if (mShader)
         return;
@@ -42,7 +43,7 @@ void VulkanShaderWrapper::CreateResource()
     mShaderCreateInfo.pName = DEFAULT_SHADER_MAIN_NAME;
 }
 
-void VulkanShaderWrapper::DestroyResource()
+void VulkanShaderWrapper::OnDestroy()
 {
     if (nullptr == mShader)
         return;
@@ -50,3 +51,5 @@ void VulkanShaderWrapper::DestroyResource()
     vkDestroyShaderModule(VulkanManager::instance()->GetDevice(), mShader, nullptr);
     mShader = nullptr;
 }
+
+void VulkanShaderWrapper::OnUpdate() {}
