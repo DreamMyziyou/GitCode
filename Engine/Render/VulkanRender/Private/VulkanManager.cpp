@@ -54,7 +54,7 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
 
 void VulkanManager::ReCreateSwapChain()
 {
-    if (VulkanResourceCenter::instance()->windowEntity == entt::null)
+    if (VkRCenter::instance()->windowEntity == entt::null)
         return;
 
     auto window = mMainWindow->QueryGlfwWindowHandle();

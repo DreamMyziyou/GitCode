@@ -235,11 +235,11 @@ void VulkanGraphicsPipeline::DrawCall()
     presentInfo.pImageIndices = &imageIndex;
     result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-    auto view = VulkanResourceCenter::instance()->world.view<WindowResizeComponent>();
+    auto view = VkRCenter::instance()->world.view<WindowResizeComponent>();
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || !view.empty())
     {
         for (const auto& entity : view)
-            VulkanResourceCenter::instance()->world.remove<WindowResizeComponent>(entity);
+            VkRCenter::instance()->world.remove<WindowResizeComponent>(entity);
         VulkanManager::instance()->ReCreateSwapChain();
         return;
     }

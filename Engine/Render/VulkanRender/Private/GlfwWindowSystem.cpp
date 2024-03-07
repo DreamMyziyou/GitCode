@@ -8,19 +8,9 @@
 
 using namespace std;
 
-GlfwWindowComponent* GlfwWindowSystem::QueryGlfwWindowComponent()
-{
-    auto& windowEntity = VulkanResourceCenter::instance()->windowEntity;
-    if (windowEntity == entt::null)
-        return nullptr;
-
-    auto& world = VulkanResourceCenter::instance()->world;
-    return world.try_get<GlfwWindowComponent>(windowEntity);
-}
-
 GLFWwindow* GlfwWindowSystem::QueryGlfwWindowHandle()
 {
-    auto windowComponent = QueryGlfwWindowComponent();
+    auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
     if (nullptr == windowComponent)
         return nullptr;
 
@@ -29,11 +19,11 @@ GLFWwindow* GlfwWindowSystem::QueryGlfwWindowHandle()
 
 void GlfwWindowSystem::OnInit()
 {
-    if (VulkanResourceCenter::instance()->windowEntity != entt::null)
+    if (VkRCenter::instance()->windowEntity != entt::null)
         return;
 
-    auto& world = VulkanResourceCenter::instance()->world;
-    auto& windowEntity = VulkanResourceCenter::instance()->windowEntity;
+    auto& world = VkRCenter::instance()->world;
+    auto& windowEntity = VkRCenter::instance()->windowEntity;
 
     windowEntity = world.create();
     auto& windowComponent = world.emplace<GlfwWindowComponent>(windowEntity);
@@ -49,28 +39,25 @@ void GlfwWindowSystem::OnInit()
 
 void GlfwWindowSystem::OnDestroy()
 {
-    if (VulkanResourceCenter::instance()->windowEntity == entt::null)
+    if (VkRCenter::instance()->windowEntity == entt::null)
         return;
 
-    auto& world = VulkanResourceCenter::instance()->world;
-    auto& windowEntity = VulkanResourceCenter::instance()->windowEntity;
-    auto windowComponent = world.try_get<GlfwWindowComponent>(windowEntity);
+    auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
     if (nullptr == windowComponent)
         return;
 
     glfwDestroyWindow(windowComponent->window);
     glfwTerminate();
 
-    world.destroy(windowEntity);
-    windowEntity = entt::null;
+    VkRCenter::instance()->world.destroy(VkRCenter::instance()->windowEntity);
+    VkRCenter::instance()->windowEntity = entt::null;
 }
 
 void GlfwWindowSystem::OnUpdate() {}
 
 void GlfwWindowSystem::Run()
 {
-    auto pWindowComponent = GlfwWindowSystem::QueryGlfwWindowComponent();
-
+    auto pWindowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
     if (!pWindowComponent || !pWindowComponent->window)
         return;
 
@@ -87,12 +74,11 @@ void GlfwWindowSystem::Run()
 
 void GlfwWindowSystem::OnFramebufferResize(GLFWwindow* window, int width, int height)
 {
-    auto& world = VulkanResourceCenter::instance()->world;
-    auto view = world.view<GlfwWindowComponent>();
-    if (view.empty())
-        return;
+    auto& world = VkRCenter::instance()->world;
+    auto windowEntity = VkRCenter::instance()->windowEntity;
 
-    auto windowEntity = *view.begin();
+    if (windowEntity == entt::null)
+        return;
     if (auto resizeComponent = world.try_get<WindowResizeComponent>(windowEntity); resizeComponent)
     {
         resizeComponent->width = width;

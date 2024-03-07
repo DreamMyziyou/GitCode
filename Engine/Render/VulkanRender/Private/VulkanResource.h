@@ -30,13 +30,22 @@ struct IVulkanSubSystem
     virtual void OnUpdate() = 0;
 };
 
-class VulkanResourceCenter final
+class VkRCenter final
 {
-    SINGLETON_CLASS(VulkanResourceCenter)
+    SINGLETON_CLASS(VkRCenter)
 
     entt::registry world;
 
     entt::entity windowEntity = entt::null;
+
+    template <typename T>
+    T* GetComponentFromWindow()
+    {
+        if (windowEntity == entt::null)
+            return nullptr;
+
+        return world.try_get<T>(windowEntity);
+    }
 };
 
 #endif  // WORKENGINE_VULKANRESOURCE_H

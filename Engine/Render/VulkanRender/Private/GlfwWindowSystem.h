@@ -11,7 +11,6 @@
 class GlfwWindowSystem final : public IVulkanSubSystem, public Render::IMainWindow
 {
 public:
-    static GlfwWindowComponent* QueryGlfwWindowComponent();
     static GLFWwindow* QueryGlfwWindowHandle();
 
 public:
