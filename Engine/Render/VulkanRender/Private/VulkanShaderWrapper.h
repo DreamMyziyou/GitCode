@@ -4,7 +4,8 @@
 #ifndef WORKENGINE_VULKANSHADERWRAPPER_H
 #define WORKENGINE_VULKANSHADERWRAPPER_H
 
-#include "VulkanResource.h"
+#include "IVulkanSubSystem.h"
+#include "VkRCenter.h"
 
 class VulkanShaderWrapper : IVulkanSubSystem
 {

@@ -5,7 +5,7 @@
 #define WORLDENGINE_SHADERBUFFER_H
 
 #include "Core/Geometry/MeshComponent.h"
-#include "VulkanResource.h"
+#include "VkRCenter.h"
 
 class ShaderBuffer final
 {

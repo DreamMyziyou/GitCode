@@ -5,7 +5,8 @@
 #ifndef WORKENGINE_VULKANSWAPCHAINWRAPPER_H
 #define WORKENGINE_VULKANSWAPCHAINWRAPPER_H
 
-#include "VulkanResource.h"
+#include "IVulkanSubSystem.h"
+#include "VkRCenter.h"
 
 class VulkanSwapChainWrapper final : public IVulkanSubSystem
 {

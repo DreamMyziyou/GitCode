@@ -5,7 +5,7 @@
 #ifndef WORKENGINE_VULKANDEVICEWRAPPER_H
 #define WORKENGINE_VULKANDEVICEWRAPPER_H
 
-#include "VulkanResource.h"
+#include "VkRCenter.h"
 #include "VulkanSyncWrapper.h"
 
 class VulkanDeviceWrapper final : public IVulkanSubSystem

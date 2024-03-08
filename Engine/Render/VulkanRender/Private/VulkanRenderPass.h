@@ -4,7 +4,8 @@
 #ifndef WORKENGINE_VULKANRENDERPASS_H
 #define WORKENGINE_VULKANRENDERPASS_H
 
-#include "VulkanResource.h"
+#include "IVulkanSubSystem.h"
+#include "VkRCenter.h"
 
 class VulkanRenderPass final : public IVulkanSubSystem
 {

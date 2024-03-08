@@ -4,7 +4,7 @@
 #ifndef WORLDENGINE_GLFWWINDOWCOMPONENT_H
 #define WORLDENGINE_GLFWWINDOWCOMPONENT_H
 
-#include "VulkanResource.h"
+#include "VkRCenter.h"
 
 struct GlfwWindowComponent
 {

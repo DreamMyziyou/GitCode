@@ -5,7 +5,8 @@
 #ifndef WORKENGINE_VULKANINSTANCEWRAPPER_H
 #define WORKENGINE_VULKANINSTANCEWRAPPER_H
 
-#include "VulkanResource.h"
+#include "IVulkanSubSystem.h"
+#include "VkRCenter.h"
 
 class VulkanInstanceWrapper final : public IVulkanSubSystem
 {

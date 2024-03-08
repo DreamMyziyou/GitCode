@@ -4,7 +4,8 @@
 #ifndef WORKENGINE_VULKANSYNCWRAPPER_H
 #define WORKENGINE_VULKANSYNCWRAPPER_H
 
-#include "VulkanResource.h"
+#include "IVulkanSubSystem.h"
+#include "VkRCenter.h"
 
 class VulkanSyncWrapper final : public IVulkanSubSystem
 {

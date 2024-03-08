@@ -5,7 +5,7 @@
 #define WORKENGINE_VULKANGRAPHICSPIPELINE_H
 
 #include "ShaderBuffer.h"
-#include "VulkanResource.h"
+#include "VkRCenter.h"
 #include "VulkanVertexShaderWrapper.h"
 
 class VulkanGraphicsPipeline final : public IVulkanSubSystem

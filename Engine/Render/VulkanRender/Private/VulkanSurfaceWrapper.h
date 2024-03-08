@@ -4,7 +4,8 @@
 #ifndef WORKENGINE_VULKANSURFACEWRAPPER_H
 #define WORKENGINE_VULKANSURFACEWRAPPER_H
 
-#include "VulkanResource.h"
+#include "IVulkanSubSystem.h"
+#include "VkRCenter.h"
 
 class VulkanSurfaceWrapper final : public IVulkanSubSystem
 {

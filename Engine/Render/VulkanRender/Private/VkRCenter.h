@@ -21,15 +21,6 @@
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-struct IVulkanSubSystem
-{
-    virtual ~IVulkanSubSystem() = default;
-
-    virtual void OnInit() = 0;
-    virtual void OnDestroy() = 0;
-    virtual void OnUpdate() = 0;
-};
-
 class VkRCenter final
 {
     SINGLETON_CLASS(VkRCenter)

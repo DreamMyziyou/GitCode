@@ -5,8 +5,9 @@
 #define WORLDENGINE_GLFWWINDOWSYSTEM_H
 
 #include "GlfwWindowComponent.h"
+#include "IVulkanSubSystem.h"
 #include "Render/RenderInterface/IWindow.h"
-#include "VulkanResource.h"
+#include "VkRCenter.h"
 
 class GlfwWindowSystem final : public IVulkanSubSystem, public Render::IMainWindow
 {
@@ -35,6 +36,9 @@ private:
     void CheckUpdate();
 
     void DrawFrame();
+
+private:
+    entt::entity mWindowEntity = entt::null;
 };
 
 #endif  // WORLDENGINE_GLFWWINDOWSYSTEM_H
