@@ -18,13 +18,16 @@
 #include "VulkanSurfaceWrapper.h"
 #include "VulkanSwapChainWrapper.h"
 
-class VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager
+class VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager, public Render::IMainWindow
 {
     SINGLETON_MODULE(VulkanManager)
 
 public:
     void StartupModule() override;
     void ShutdownModule() override;
+
+public:
+    void Run() override;
 
 public:
     VkInstance GetVulkanInstance() const { return mInstance->GetVulkanInstance(); }

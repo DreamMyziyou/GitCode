@@ -44,12 +44,29 @@ void VulkanManager::ShutdownModule()
     mMainWindow = nullptr;
 }
 
+void VulkanManager::Run()
+{
+    auto pWindowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
+    if (!pWindowComponent || !pWindowComponent->window)
+        return;
+
+    mMainWindow->CheckUpdate();
+
+    while (!glfwWindowShouldClose(pWindowComponent->window))
+    {
+        glfwPollEvents();
+        mMainWindow->DrawFrame();
+    }
+
+    vkDeviceWaitIdle(VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice());
+}
+
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
 {
     for (const auto& subSystem : mSystemStack)
         subSystem->OnInit();
 
-    return mMainWindow.get();
+    return this;
 }
 
 void VulkanManager::ReCreateSwapChain()

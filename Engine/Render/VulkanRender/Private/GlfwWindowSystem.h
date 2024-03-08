@@ -9,7 +9,7 @@
 #include "Render/RenderInterface/IWindow.h"
 #include "VkRCenter.h"
 
-class GlfwWindowSystem final : public IVulkanSubSystem, public Render::IMainWindow
+class GlfwWindowSystem final : public IVulkanSubSystem
 {
 public:
     static GLFWwindow* QueryGlfwWindowHandle();
@@ -26,19 +26,11 @@ public:
     void OnUpdate() override;
 
 public:
-    void Run() override;
-
-private:
-    static void OnFramebufferResize(GLFWwindow* window, int width, int height);
-
-private:
-    // temp for check world
     void CheckUpdate();
-
     void DrawFrame();
 
 private:
-    entt::entity mWindowEntity = entt::null;
+    static void OnFramebufferResize(GLFWwindow* window, int width, int height);
 };
 
 #endif  // WORLDENGINE_GLFWWINDOWSYSTEM_H

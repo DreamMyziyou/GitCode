@@ -55,43 +55,6 @@ void GlfwWindowSystem::OnDestroy()
 
 void GlfwWindowSystem::OnUpdate() {}
 
-void GlfwWindowSystem::Run()
-{
-    auto pWindowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
-    if (!pWindowComponent || !pWindowComponent->window)
-        return;
-
-    CheckUpdate();
-
-    while (!glfwWindowShouldClose(pWindowComponent->window))
-    {
-        glfwPollEvents();
-        DrawFrame();
-    }
-
-    vkDeviceWaitIdle(VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice());
-}
-
-void GlfwWindowSystem::OnFramebufferResize(GLFWwindow* window, int width, int height)
-{
-    auto& world = VkRCenter::instance()->world;
-    auto windowEntity = VkRCenter::instance()->windowEntity;
-
-    if (windowEntity == entt::null)
-        return;
-    if (auto resizeComponent = world.try_get<WindowResizeComponent>(windowEntity); resizeComponent)
-    {
-        resizeComponent->width = width;
-        resizeComponent->height = height;
-    }
-    else
-    {
-        auto& newResizeComponent = world.emplace<WindowResizeComponent>(windowEntity);
-        newResizeComponent.width = width;
-        newResizeComponent.height = height;
-    }
-}
-
 void GlfwWindowSystem::CheckUpdate()
 {
     auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
@@ -115,4 +78,24 @@ void GlfwWindowSystem::DrawFrame()
         return;
 
     pipeline->DrawCall();
+}
+
+void GlfwWindowSystem::OnFramebufferResize(GLFWwindow* window, int width, int height)
+{
+    auto& world = VkRCenter::instance()->world;
+    auto windowEntity = VkRCenter::instance()->windowEntity;
+
+    if (windowEntity == entt::null)
+        return;
+    if (auto resizeComponent = world.try_get<WindowResizeComponent>(windowEntity); resizeComponent)
+    {
+        resizeComponent->width = width;
+        resizeComponent->height = height;
+    }
+    else
+    {
+        auto& newResizeComponent = world.emplace<WindowResizeComponent>(windowEntity);
+        newResizeComponent.width = width;
+        newResizeComponent.height = height;
+    }
 }
