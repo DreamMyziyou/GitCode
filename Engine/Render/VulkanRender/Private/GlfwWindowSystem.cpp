@@ -8,15 +8,6 @@
 
 using namespace std;
 
-GLFWwindow* GlfwWindowSystem::QueryGlfwWindowHandle()
-{
-    auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
-    if (nullptr == windowComponent)
-        return nullptr;
-
-    return windowComponent->window;
-}
-
 void GlfwWindowSystem::OnInit()
 {
     if (VkRCenter::instance()->windowEntity != entt::null)

@@ -6,15 +6,20 @@
 #include <algorithm>
 #include <limits>
 
+#include "GlfwWindowComponent.h"
 #include "VulkanManager.h"
 
 using namespace std;
 
 void VulkanSurfaceWrapper::OnInit()
 {
+    auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
+    if (!windowComponent || !windowComponent->window)
+        return;
+
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    createInfo.hwnd = glfwGetWin32Window(GlfwWindowSystem::QueryGlfwWindowHandle());
+    createInfo.hwnd = glfwGetWin32Window(windowComponent->window);
     createInfo.hinstance = GetModuleHandle(nullptr);
 
     VkSurfaceKHR surface = nullptr;

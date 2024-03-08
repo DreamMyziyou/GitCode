@@ -4,6 +4,8 @@
 
 #include "VulkanManager.h"
 
+#include "GlfwWindowSystem.h"
+
 using namespace std;
 
 void VulkanManager::StartupModule()
@@ -71,10 +73,11 @@ Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, Stri
 
 void VulkanManager::ReCreateSwapChain()
 {
-    if (nullptr == VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>())
+    auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
+    if (!windowComponent || !windowComponent->window)
         return;
 
-    auto window = mMainWindow->QueryGlfwWindowHandle();
+    auto window = windowComponent->window;
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
     while (width == 0 || height == 0)

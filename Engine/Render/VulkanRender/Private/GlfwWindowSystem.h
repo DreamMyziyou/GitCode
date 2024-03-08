@@ -12,9 +12,6 @@
 class GlfwWindowSystem final : public IVulkanSubSystem
 {
 public:
-    static GLFWwindow* QueryGlfwWindowHandle();
-
-public:
     GlfwWindowSystem() = default;
     ~GlfwWindowSystem() override = default;
     GlfwWindowSystem(const GlfwWindowSystem&) = delete;

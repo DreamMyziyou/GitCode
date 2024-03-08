@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "Core/ModuleCore/ModuleSingleton.h"
-#include "GlfwWindowSystem.h"
 #include "VulkanDeviceWrapper.h"
 #include "VulkanGraphicsPipeline.h"
 #include "VulkanInstanceWrapper.h"
@@ -18,6 +17,7 @@
 #include "VulkanSurfaceWrapper.h"
 #include "VulkanSwapChainWrapper.h"
 
+class GlfwWindowSystem;
 class VulkanManager final : public ModuleCore::IModule, public VulkanRender::IManager, public Render::IMainWindow
 {
     SINGLETON_MODULE(VulkanManager)

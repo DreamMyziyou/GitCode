@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "GlfwWindowComponent.h"
 #include "UniformBuffer.h"
 #include "VulkanManager.h"
 
