@@ -15,8 +15,7 @@ void VulkanManager::StartupModule()
     mMainWindow = make_shared<GlfwWindowSystem>();
     mSystemStack.push_back(mMainWindow);
 
-    mInstance = make_shared<VulkanInstanceWrapper>();
-    mSystemStack.push_back(mInstance);
+    mSystemStack.push_back(make_shared<VulkanInstanceSystem>());
 
     mSurface = make_shared<VulkanSurfaceWrapper>();
     mSystemStack.push_back(mSurface);

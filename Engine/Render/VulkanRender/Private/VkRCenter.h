@@ -28,6 +28,7 @@ class VkRCenter final
     entt::registry world;
 
     entt::entity windowEntity = entt::null;
+    entt::entity vulkanEntity = entt::null;
 
     template <typename T>
     T* GetComponentFromWindow()
@@ -36,6 +37,15 @@ class VkRCenter final
             return nullptr;
 
         return world.try_get<T>(windowEntity);
+    }
+
+    template <typename T>
+    T* GetComponentFromVulkan()
+    {
+        if (vulkanEntity == entt::null)
+            return nullptr;
+
+        return world.try_get<T>(vulkanEntity);
     }
 };
 

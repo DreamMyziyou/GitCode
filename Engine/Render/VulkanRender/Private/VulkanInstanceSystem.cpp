@@ -2,9 +2,10 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#include "VulkanInstanceWrapper.h"
-
 #include <vector>
+
+#include "VulkanComponent.h"
+#include "VulkanInstanceSystem.h"
 
 using namespace std;
 
@@ -24,8 +25,17 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
     return VK_FALSE;
 }
 
-void VulkanInstanceWrapper::OnInit()
+void VulkanInstanceSystem::OnInit()
 {
+    auto center = VkRCenter::instance();
+    if (center->vulkanEntity != entt::null)
+        return;
+
+    center->vulkanEntity = center->world.create();
+    if (center->world.try_get<VulkanInstanceComponent>(center->vulkanEntity))
+        return;
+    auto& vulkanComponent = center->world.emplace<VulkanInstanceComponent>(center->vulkanEntity);
+
     // app info
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -45,7 +55,7 @@ void VulkanInstanceWrapper::OnInit()
     if (ENABLE_VALIDATION_LAYERS)
     {
         if (CheckValidationLayer())
-            mApplyValidationLayer = true;
+            vulkanComponent.applyValidationLayer = true;
         else
             Logger::LogError("VulkanRender", "Validation layers requested, but not available!");
     }
@@ -54,13 +64,13 @@ void VulkanInstanceWrapper::OnInit()
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-    if (mApplyValidationLayer)
+    if (vulkanComponent.applyValidationLayer)
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     // set vaildation layer
-    if (mApplyValidationLayer)
+    if (vulkanComponent.applyValidationLayer)
     {
         VkDebugUtilsMessengerCreateInfoEXT debugInfo;
         BuildDebugInfoTo(debugInfo);
@@ -75,8 +85,8 @@ void VulkanInstanceWrapper::OnInit()
     }
 
     // create instance
-    mInitResult = vkCreateInstance(&createInfo, nullptr, &mInstance);
-    if (mInitResult != VK_SUCCESS)
+    auto vkResult = vkCreateInstance(&createInfo, nullptr, &vulkanComponent.instance);
+    if (vkResult != VK_SUCCESS)
         Logger::LogFatal("VulkanRender", "Init Vulkan failed");
     else
         Logger::LogInfo("VulkanRender", "Init Vulkan success.");
@@ -88,26 +98,29 @@ void VulkanInstanceWrapper::OnInit()
     CheckInstanceExtension();
 }
 
-void VulkanInstanceWrapper::OnDestroy()
+void VulkanInstanceSystem::OnDestroy()
 {
-    if (!mInstance)
+    auto vulkanComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanInstanceComponent>();
+    if (vulkanComponent == nullptr)
         return;
 
-    if (mApplyValidationLayer)
+    if (vulkanComponent->applyValidationLayer)
     {
-        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(mInstance, "vkDestroyDebugUtilsMessengerEXT");
+        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vulkanComponent->instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr)
-            func(mInstance, mDebugMessenger, nullptr);
+            func(vulkanComponent->instance, vulkanComponent->debugMessenger, nullptr);
     }
 
-    vkDestroyInstance(mInstance, nullptr);
-    mInstance = nullptr;
+    vkDestroyInstance(vulkanComponent->instance, nullptr);
+    VkRCenter::instance()->world.destroy(VkRCenter::instance()->vulkanEntity);
+    VkRCenter::instance()->vulkanEntity = entt::null;
+
     Logger::LogInfo("VulkanRender", "Uninit Vulkan.");
 }
 
-void VulkanInstanceWrapper::OnUpdate() {}
+void VulkanInstanceSystem::OnUpdate() {}
 
-void VulkanInstanceWrapper::CheckInstanceExtension() const
+void VulkanInstanceSystem::CheckInstanceExtension() const
 {
     uint32_t extensionCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -124,7 +137,7 @@ void VulkanInstanceWrapper::CheckInstanceExtension() const
     Logger::LogInfo("VulkanRender", logMsg);
 }
 
-bool VulkanInstanceWrapper::CheckValidationLayer() const
+bool VulkanInstanceSystem::CheckValidationLayer() const
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -152,7 +165,7 @@ bool VulkanInstanceWrapper::CheckValidationLayer() const
     return true;
 }
 
-void VulkanInstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)
+void VulkanInstanceSystem::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT& debugCreateInfo)
 {
     debugCreateInfo = {};
     debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -164,14 +177,17 @@ void VulkanInstanceWrapper::BuildDebugInfoTo(VkDebugUtilsMessengerCreateInfoEXT&
     debugCreateInfo.pUserData = nullptr;  // Optional
 }
 
-void VulkanInstanceWrapper::BuildDebugMessenger()
+void VulkanInstanceSystem::BuildDebugMessenger()
 {
-    if (!mApplyValidationLayer)
+    auto vulkanComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanInstanceComponent>();
+    if (vulkanComponent == nullptr)
+        return;
+    if (!vulkanComponent->applyValidationLayer)
         return;
 
     VkDebugUtilsMessengerCreateInfoEXT debugInfo;
     BuildDebugInfoTo(debugInfo);
 
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT");
-    func(mInstance, &debugInfo, nullptr, &mDebugMessenger);
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vulkanComponent->instance, "vkCreateDebugUtilsMessengerEXT");
+    func(vulkanComponent->instance, &debugInfo, nullptr, &vulkanComponent->debugMessenger);
 }

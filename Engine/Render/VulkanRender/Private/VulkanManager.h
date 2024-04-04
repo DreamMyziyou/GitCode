@@ -11,7 +11,7 @@
 #include "Core/ModuleCore/ModuleSingleton.h"
 #include "VulkanDeviceWrapper.h"
 #include "VulkanGraphicsPipeline.h"
-#include "VulkanInstanceWrapper.h"
+#include "VulkanInstanceSystem.h"
 #include "VulkanRender.h"
 #include "VulkanRenderPass.h"
 #include "VulkanSurfaceWrapper.h"
@@ -30,7 +30,6 @@ public:
     void Run() override;
 
 public:
-    VkInstance GetVulkanInstance() const { return mInstance->GetVulkanInstance(); }
     VkDevice GetDevice() const { return mDevice->GetLogicDevice(); }
     VkRenderPass GetRenderPass() const { return mRenderPass->GetRenderPass(); }
     std::shared_ptr<VulkanSurfaceWrapper> GetSurfaceWrapper() const { return mSurface; }
@@ -46,7 +45,6 @@ private:
     std::vector<std::shared_ptr<IVulkanSubSystem>> mSystemStack;
 
     std::shared_ptr<GlfwWindowSystem> mMainWindow = nullptr;
-    std::shared_ptr<VulkanInstanceWrapper> mInstance = nullptr;
     std::shared_ptr<VulkanSurfaceWrapper> mSurface = nullptr;
     std::shared_ptr<VulkanDeviceWrapper> mDevice = nullptr;
     std::shared_ptr<VulkanRenderPass> mRenderPass = nullptr;

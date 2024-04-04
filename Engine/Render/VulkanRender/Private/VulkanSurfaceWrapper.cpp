@@ -7,6 +7,7 @@
 #include <limits>
 
 #include "GlfwWindowComponent.h"
+#include "VulkanComponent.h"
 #include "VulkanManager.h"
 
 using namespace std;
@@ -16,6 +17,9 @@ void VulkanSurfaceWrapper::OnInit()
     auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
     if (!windowComponent || !windowComponent->window)
         return;
+    auto vulkanComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanInstanceComponent>();
+    if (!vulkanComponent)
+        return;
 
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -23,7 +27,7 @@ void VulkanSurfaceWrapper::OnInit()
     createInfo.hinstance = GetModuleHandle(nullptr);
 
     VkSurfaceKHR surface = nullptr;
-    if (vkCreateWin32SurfaceKHR(VulkanManager::instance()->GetVulkanInstance(), &createInfo, nullptr, &surface) != VK_SUCCESS)
+    if (vkCreateWin32SurfaceKHR(vulkanComponent->instance, &createInfo, nullptr, &surface) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "Failed to create window surface!");
     else
         mSurface = surface;
@@ -33,8 +37,11 @@ void VulkanSurfaceWrapper::OnDestroy()
 {
     if (nullptr == mSurface)
         return;
+    auto vulkanComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanInstanceComponent>();
+    if (!vulkanComponent)
+        return;
 
-    vkDestroySurfaceKHR(VulkanManager::instance()->GetVulkanInstance(), mSurface, nullptr);
+    vkDestroySurfaceKHR(vulkanComponent->instance, mSurface, nullptr);
     mSurface = nullptr;
 }
 

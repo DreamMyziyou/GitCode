@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Engine.h"
+#include "VulkanComponent.h"
 #include "VulkanManager.h"
 
 using namespace std;
@@ -125,13 +126,17 @@ int32 VulkanDeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
 
 void VulkanDeviceWrapper::CreatePhysicalDevice()
 {
+    auto vulkanComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanInstanceComponent>();
+    if (!vulkanComponent)
+        return;
+
     // Get device
     uint32 deviceCount = 0;
-    vkEnumeratePhysicalDevices(VulkanManager::instance()->GetVulkanInstance(), &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(vulkanComponent->instance, &deviceCount, nullptr);
     if (deviceCount == 0)
         return Logger::LogFatal("VulkanRender", "Failed to find GPUs with Vulkan support!");
     vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(VulkanManager::instance()->GetVulkanInstance(), &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(vulkanComponent->instance, &deviceCount, devices.data());
 
     // Use an ordered map to automatically sort candidates by increasing score
     multimap<int32, VkPhysicalDevice> candidates;
