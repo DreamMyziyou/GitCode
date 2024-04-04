@@ -6,7 +6,7 @@
 
 #include <array>
 
-#include "Core/Geometry/Vertex.h"
+#include "Geometry/Vertex.h"
 #include "VkRCenter.h"
 
 namespace GeometryToVulkan

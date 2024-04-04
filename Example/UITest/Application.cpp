@@ -4,7 +4,7 @@
 
 #include "Application.h"
 
-#include "Core/Geometry/MeshComponent.h"
+#include "Geometry/MeshComponent.h"
 #include "Core/World/World.h"
 
 using namespace std;

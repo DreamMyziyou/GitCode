@@ -4,7 +4,7 @@
 #ifndef WORLDENGINE_SHADERBUFFER_H
 #define WORLDENGINE_SHADERBUFFER_H
 
-#include "Core/Geometry/MeshComponent.h"
+#include "Geometry/MeshComponent.h"
 #include "VkRCenter.h"
 
 class ShaderBuffer final
