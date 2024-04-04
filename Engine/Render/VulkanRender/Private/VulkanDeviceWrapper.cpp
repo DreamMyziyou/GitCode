@@ -10,7 +10,6 @@
 
 #include "Engine.h"
 #include "VulkanComponent.h"
-#include "VulkanManager.h"
 
 using namespace std;
 
@@ -78,9 +77,11 @@ bool VulkanDeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
     if (!device)
         return false;
 
-    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return false;
 
-    auto indices = surfaceWrapper->FindQueueFamilies(device);
+    auto indices = surfaceComponent->FindQueueFamilies(device);
     if (!indices.IsComplete())
         return false;
 
@@ -88,7 +89,7 @@ bool VulkanDeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
     if (!extensionsSupported)
         return false;
 
-    auto swapChainSupport = surfaceWrapper->QuerySwapChainSupport(device);
+    auto swapChainSupport = surfaceComponent->QuerySwapChainSupport(device);
     bool swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 
     if (!swapChainAdequate)
@@ -152,16 +153,21 @@ void VulkanDeviceWrapper::CreatePhysicalDevice()
     else
         return Logger::LogFatal("VulkanRender", "Failed to find a suitable GPU!");
 
-    VulkanManager::instance()->GetSurfaceWrapper()->OnUpdate(mPhysicalDevice);
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return;
+    surfaceComponent->update(mPhysicalDevice);
 }
 
 void VulkanDeviceWrapper::CreateLogicDevice()
 {
     if (!mPhysicalDevice)
         return;
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return;
 
-    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
-    auto indices = surfaceWrapper->FindQueueFamilies(mPhysicalDevice);
+    auto indices = surfaceComponent->FindQueueFamilies(mPhysicalDevice);
 
     vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
@@ -196,8 +202,10 @@ void VulkanDeviceWrapper::CreateLogicDevice()
 
 void VulkanDeviceWrapper::CreateCommand()
 {
-    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
-    auto indices = surfaceWrapper->FindQueueFamilies(mPhysicalDevice);
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return;
+    auto indices = surfaceComponent->FindQueueFamilies(mPhysicalDevice);
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;

@@ -3,12 +3,17 @@
 //
 #include "VulkanRenderPass.h"
 
+#include "VulkanComponent.h"
 #include "VulkanManager.h"
 
 void VulkanRenderPass::OnInit()
 {
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return;
+
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = VulkanManager::instance()->GetSurfaceWrapper()->GetExpectSurfaceFormat().format;
+    colorAttachment.format = surfaceComponent->expectSurfaceFormat.format;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;

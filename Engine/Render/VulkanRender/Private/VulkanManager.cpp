@@ -5,6 +5,7 @@
 #include "VulkanManager.h"
 
 #include "GlfwWindowSystem.h"
+#include "VulkanComponent.h"
 
 using namespace std;
 
@@ -16,9 +17,7 @@ void VulkanManager::StartupModule()
     mSystemStack.push_back(mMainWindow);
 
     mSystemStack.push_back(make_shared<VulkanInstanceSystem>());
-
-    mSurface = make_shared<VulkanSurfaceWrapper>();
-    mSystemStack.push_back(mSurface);
+    mSystemStack.push_back(make_shared<VulkanSurfaceSystem>());
 
     mDevice = make_shared<VulkanDeviceWrapper>();
     mSystemStack.push_back(mDevice);
@@ -75,6 +74,9 @@ void VulkanManager::ReCreateSwapChain()
     auto windowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
     if (!windowComponent || !windowComponent->window)
         return;
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return;
 
     auto window = windowComponent->window;
     int width = 0, height = 0;
@@ -87,7 +89,7 @@ void VulkanManager::ReCreateSwapChain()
 
     vkDeviceWaitIdle(GetDevice());
 
-    mSurface->OnUpdate(mDevice->GetPhysicalDevice());
+    surfaceComponent->update(mDevice->GetPhysicalDevice());
     mSwapChain->OnDestroy();
     mSwapChain->OnInit();
 }

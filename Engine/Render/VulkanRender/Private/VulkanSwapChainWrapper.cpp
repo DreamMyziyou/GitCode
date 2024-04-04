@@ -4,6 +4,7 @@
 
 #include "VulkanSwapChainWrapper.h"
 
+#include "VulkanComponent.h"
 #include "VulkanManager.h"
 
 using namespace std;
@@ -37,12 +38,14 @@ void VulkanSwapChainWrapper::OnUpdate() {}
 
 void VulkanSwapChainWrapper::CreateSwapChain()
 {
-    auto surfaceWrapper = VulkanManager::instance()->GetSurfaceWrapper();
-    auto expectFormat = surfaceWrapper->GetExpectSurfaceFormat();
-    auto expectSwapExtent = surfaceWrapper->GetExpectSwapChainExtent();
-    auto expectBufferCount = surfaceWrapper->GetExpectSwapChainBufferCount();
-    auto presentMode = surfaceWrapper->GetExpectPresentMode();
-    auto& surfaceCapabilities = surfaceWrapper->GetSurfaceCapabilities();
+    auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
+    if (!surfaceComponent)
+        return;
+    auto expectFormat = surfaceComponent->expectSurfaceFormat;
+    auto expectSwapExtent = surfaceComponent->expectSwapChainExtent;
+    auto expectBufferCount = surfaceComponent->expectSwapChainBufferCount;
+    auto presentMode = surfaceComponent->expectPresentMode;
+    auto& surfaceCapabilities = surfaceComponent->surfaceCapabilities;
 
     auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
     auto physicalDevice = deviceWrapper->GetPhysicalDevice();
@@ -50,7 +53,7 @@ void VulkanSwapChainWrapper::CreateSwapChain()
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = surfaceWrapper->GetSurface();
+    createInfo.surface = surfaceComponent->surface;
     createInfo.minImageCount = expectBufferCount;
     createInfo.imageFormat = expectFormat.format;
     createInfo.imageColorSpace = expectFormat.colorSpace;
@@ -58,7 +61,7 @@ void VulkanSwapChainWrapper::CreateSwapChain()
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    auto indices = surfaceWrapper->FindQueueFamilies(physicalDevice);
+    auto indices = surfaceComponent->FindQueueFamilies(physicalDevice);
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     if (indices.graphicsFamily != indices.presentFamily)

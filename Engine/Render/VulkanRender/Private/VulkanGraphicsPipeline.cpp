@@ -11,6 +11,7 @@
 
 #include "GlfwWindowComponent.h"
 #include "UniformBuffer.h"
+#include "VulkanComponent.h"
 #include "VulkanManager.h"
 
 using namespace std;
@@ -30,7 +31,7 @@ void VulkanGraphicsPipeline::OnInit()
     dynamicState.pDynamicStates = dynamicStates.data();
 
     auto device = VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice();
-    auto swapChainExtent = VulkanManager::instance()->GetSurfaceWrapper()->GetExpectSwapChainExtent();
+    auto swapChainExtent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>()->expectSwapChainExtent;
 
     VkViewport viewport{};
     viewport.x = 0.0f;

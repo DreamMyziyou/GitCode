@@ -14,7 +14,7 @@
 #include "VulkanInstanceSystem.h"
 #include "VulkanRender.h"
 #include "VulkanRenderPass.h"
-#include "VulkanSurfaceWrapper.h"
+#include "VulkanSurfaceSystem.h"
 #include "VulkanSwapChainWrapper.h"
 
 class GlfwWindowSystem;
@@ -32,7 +32,6 @@ public:
 public:
     VkDevice GetDevice() const { return mDevice->GetLogicDevice(); }
     VkRenderPass GetRenderPass() const { return mRenderPass->GetRenderPass(); }
-    std::shared_ptr<VulkanSurfaceWrapper> GetSurfaceWrapper() const { return mSurface; }
     std::shared_ptr<VulkanDeviceWrapper> GetDeviceWrapper() const { return mDevice; }
     std::shared_ptr<VulkanGraphicsPipeline> GetPipelineWrapper() const { return mPipeline; }
     std::shared_ptr<VulkanSwapChainWrapper> GetSwapChainWrapper() const { return mSwapChain; }
@@ -45,7 +44,6 @@ private:
     std::vector<std::shared_ptr<IVulkanSubSystem>> mSystemStack;
 
     std::shared_ptr<GlfwWindowSystem> mMainWindow = nullptr;
-    std::shared_ptr<VulkanSurfaceWrapper> mSurface = nullptr;
     std::shared_ptr<VulkanDeviceWrapper> mDevice = nullptr;
     std::shared_ptr<VulkanRenderPass> mRenderPass = nullptr;
     std::shared_ptr<VulkanGraphicsPipeline> mPipeline = nullptr;
