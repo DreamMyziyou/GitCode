@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_APPEXPORT_H
-#define WORKENGINE_APPEXPORT_H
+#ifndef WORLDENGINE_APPEXPORT_H
+#define WORLDENGINE_APPEXPORT_H
 
 #ifdef _WIN32
 #ifdef APP_BUILD
@@ -15,4 +15,4 @@
 #define APP_API
 #endif
 
-#endif  // WORKENGINE_APPEXPORT_H
+#endif  // WORLDENGINE_APPEXPORT_H

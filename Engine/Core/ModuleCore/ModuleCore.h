@@ -2,8 +2,8 @@
 // Created by chenwei on 2024/1/9.
 //
 
-#ifndef WORKENGINE_MODULECORE_H
-#define WORKENGINE_MODULECORE_H
+#ifndef WORLDENGINE_MODULECORE_H
+#define WORLDENGINE_MODULECORE_H
 
 #include "ModuleCoreExport.h"
 
@@ -27,4 +27,4 @@ namespace ModuleCore
 
 }  // namespace ModuleCore
 
-#endif  // WORKENGINE_MODULECORE_H
+#endif  // WORLDENGINE_MODULECORE_H

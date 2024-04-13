@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/20.
 //
 
-#ifndef WORKENGINE_WORLDEXPORT_H
-#define WORKENGINE_WORLDEXPORT_H
+#ifndef WORLDENGINE_WORLDEXPORT_H
+#define WORLDENGINE_WORLDEXPORT_H
 
 #ifdef _WIN32
 #ifdef WORLD_BUILD
@@ -15,4 +15,4 @@
 #define WORLD_API
 #endif
 
-#endif  // WORKENGINE_WORLDEXPORT_H
+#endif  // WORLDENGINE_WORLDEXPORT_H

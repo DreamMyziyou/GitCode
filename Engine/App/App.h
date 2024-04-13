@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_APP_H
-#define WORKENGINE_APP_H
+#ifndef WORLDENGINE_APP_H
+#define WORLDENGINE_APP_H
 
 #include "AppExport.h"
 
@@ -19,4 +19,4 @@ public:
     virtual void Run() = 0;
 };
 
-#endif  // WORKENGINE_APP_H
+#endif  // WORLDENGINE_APP_H

@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_VULKANMANAGER_H
-#define WORKENGINE_VULKANMANAGER_H
+#ifndef WORLDENGINE_VULKANMANAGER_H
+#define WORLDENGINE_VULKANMANAGER_H
 
 #include <memory>
 #include <vector>
@@ -50,4 +50,4 @@ private:
     std::shared_ptr<VulkanSwapChainWrapper> mSwapChain = nullptr;
 };
 
-#endif  // WORKENGINE_VULKANMANAGER_H
+#endif  // WORLDENGINE_VULKANMANAGER_H

@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_VULKANINSTANCESYSTEM_H
-#define WORKENGINE_VULKANINSTANCESYSTEM_H
+#ifndef WORLDENGINE_VULKANINSTANCESYSTEM_H
+#define WORLDENGINE_VULKANINSTANCESYSTEM_H
 
 #include "IVulkanSubSystem.h"
 #include "VkRCenter.h"
@@ -31,4 +31,4 @@ private:
     void BuildDebugMessenger();
 };
 
-#endif  // WORKENGINE_VULKANINSTANCESYSTEM_H
+#endif  // WORLDENGINE_VULKANINSTANCESYSTEM_H

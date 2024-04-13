@@ -1,8 +1,8 @@
 //
 // Created by WeslyChen on 2024/1/28.
 //
-#ifndef WORKENGINE_VULKANRENDERPASS_H
-#define WORKENGINE_VULKANRENDERPASS_H
+#ifndef WORLDENGINE_VULKANRENDERPASS_H
+#define WORLDENGINE_VULKANRENDERPASS_H
 
 #include "IVulkanSubSystem.h"
 #include "VkRCenter.h"
@@ -27,4 +27,4 @@ private:
     VkRenderPass mRenderPass = nullptr;
 };
 
-#endif  // WORKENGINE_VULKANRENDERPASS_H
+#endif  // WORLDENGINE_VULKANRENDERPASS_H

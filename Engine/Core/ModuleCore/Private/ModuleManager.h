@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/14.
 //
 
-#ifndef WORKENGINE_MODULEMANAGER_H
-#define WORKENGINE_MODULEMANAGER_H
+#ifndef WORLDENGINE_MODULEMANAGER_H
+#define WORLDENGINE_MODULEMANAGER_H
 
 #include <stack>
 
@@ -26,4 +26,4 @@ private:
     std::stack<ModuleCore::IModule*> mModules;
 };
 
-#endif  // WORKENGINE_MODULEMANAGER_H
+#endif  // WORLDENGINE_MODULEMANAGER_H

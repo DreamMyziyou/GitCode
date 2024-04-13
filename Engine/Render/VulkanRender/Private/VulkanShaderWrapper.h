@@ -1,8 +1,8 @@
 //
 // Created by WeslyChen on 2024/1/28.
 //
-#ifndef WORKENGINE_VULKANSHADERWRAPPER_H
-#define WORKENGINE_VULKANSHADERWRAPPER_H
+#ifndef WORLDENGINE_VULKANSHADERWRAPPER_H
+#define WORLDENGINE_VULKANSHADERWRAPPER_H
 
 #include "IVulkanSubSystem.h"
 #include "VkRCenter.h"
@@ -35,4 +35,4 @@ protected:
     VkPipelineShaderStageCreateInfo mShaderCreateInfo;
 };
 
-#endif  // WORKENGINE_VULKANSHADERWRAPPER_H
+#endif  // WORLDENGINE_VULKANSHADERWRAPPER_H

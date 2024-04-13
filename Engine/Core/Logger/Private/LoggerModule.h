@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/19.
 //
 
-#ifndef WORKENGINE_LOGGERMODULE_H
-#define WORKENGINE_LOGGERMODULE_H
+#ifndef WORLDENGINE_LOGGERMODULE_H
+#define WORLDENGINE_LOGGERMODULE_H
 
 #include "Core/Common/ClassMacro.h"
 #include "Logger.h"
@@ -24,4 +24,4 @@ private:
     bool mIsEnabled = true;
 };
 
-#endif  // WORKENGINE_LOGGERMODULE_H
+#endif  // WORLDENGINE_LOGGERMODULE_H

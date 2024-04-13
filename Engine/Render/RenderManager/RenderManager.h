@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_RENDERMANAGER_H
-#define WORKENGINE_RENDERMANAGER_H
+#ifndef WORLDENGINE_RENDERMANAGER_H
+#define WORLDENGINE_RENDERMANAGER_H
 
 #include <memory>
 
@@ -22,4 +22,4 @@ namespace RenderManager
 
 }  // namespace RenderManager
 
-#endif  // WORKENGINE_RENDERMANAGER_H
+#endif  // WORLDENGINE_RENDERMANAGER_H

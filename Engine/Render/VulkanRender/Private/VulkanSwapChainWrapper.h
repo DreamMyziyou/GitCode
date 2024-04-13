@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/25.
 //
 
-#ifndef WORKENGINE_VULKANSWAPCHAINWRAPPER_H
-#define WORKENGINE_VULKANSWAPCHAINWRAPPER_H
+#ifndef WORLDENGINE_VULKANSWAPCHAINWRAPPER_H
+#define WORLDENGINE_VULKANSWAPCHAINWRAPPER_H
 
 #include "IVulkanSubSystem.h"
 #include "VkRCenter.h"
@@ -40,4 +40,4 @@ private:
     std::vector<VkFramebuffer> mSwapChainFrameBuffers;
 };
 
-#endif  // WORKENGINE_VULKANSWAPCHAINWRAPPER_H
+#endif  // WORLDENGINE_VULKANSWAPCHAINWRAPPER_H

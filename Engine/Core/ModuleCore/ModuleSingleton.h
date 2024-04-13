@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/18.
 //
 
-#ifndef WORKENGINE_MODULESINGLETON_H
-#define WORKENGINE_MODULESINGLETON_H
+#ifndef WORLDENGINE_MODULESINGLETON_H
+#define WORLDENGINE_MODULESINGLETON_H
 
 #include "ModuleCore.h"
 
@@ -27,4 +27,4 @@ public:                                                              \
         return &(instance.instance);                                 \
     }
 
-#endif  // WORKENGINE_MODULESINGLETON_H
+#endif  // WORLDENGINE_MODULESINGLETON_H

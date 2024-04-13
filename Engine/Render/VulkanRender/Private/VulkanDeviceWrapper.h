@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_VULKANDEVICEWRAPPER_H
-#define WORKENGINE_VULKANDEVICEWRAPPER_H
+#ifndef WORLDENGINE_VULKANDEVICEWRAPPER_H
+#define WORLDENGINE_VULKANDEVICEWRAPPER_H
 
 #include "VkRCenter.h"
 #include "VulkanSyncWrapper.h"
@@ -53,4 +53,4 @@ private:
     std::shared_ptr<VulkanSyncWrapper> mSyncObject = nullptr;
 };
 
-#endif  // WORKENGINE_VULKANDEVICEWRAPPER_H
+#endif  // WORLDENGINE_VULKANDEVICEWRAPPER_H

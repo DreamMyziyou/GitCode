@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/11.
 //
 
-#ifndef WORKENGINE_ERRORCODE_H
-#define WORKENGINE_ERRORCODE_H
+#ifndef WORLDENGINE_ERRORCODE_H
+#define WORLDENGINE_ERRORCODE_H
 
 #include "Core/BasicType/BasicType.h"
 
@@ -14,4 +14,4 @@ enum class ErrorCode : uint16
     Default = Success
 };
 
-#endif  // WORKENGINE_ERRORCODE_H
+#endif  // WORLDENGINE_ERRORCODE_H

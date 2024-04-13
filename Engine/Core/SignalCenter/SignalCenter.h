@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/20.
 //
 
-#ifndef WORKENGINE_SIGNALCENTER_H
-#define WORKENGINE_SIGNALCENTER_H
+#ifndef WORLDENGINE_SIGNALCENTER_H
+#define WORLDENGINE_SIGNALCENTER_H
 
 #include <boost/signals2.hpp>
 
@@ -23,4 +23,4 @@ namespace SignalCenter
 
 }  // namespace SignalCenter
 
-#endif  // WORKENGINE_SIGNALCENTER_H
+#endif  // WORLDENGINE_SIGNALCENTER_H

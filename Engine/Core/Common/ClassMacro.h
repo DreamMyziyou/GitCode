@@ -2,8 +2,8 @@
 // Created by chenwei on 2023/11/19.
 //
 
-#ifndef WORKENGINE_CLASSMACRO_H
-#define WORKENGINE_CLASSMACRO_H
+#ifndef WORLDENGINE_CLASSMACRO_H
+#define WORLDENGINE_CLASSMACRO_H
 
 #define SINGLETON_CLASS(CLASS_NAME)                    \
 private:                                               \
@@ -33,4 +33,4 @@ public:                                                \
         return &gInstance;                             \
     }
 
-#endif  // WORKENGINE_CLASSMACRO_H
+#endif  // WORLDENGINE_CLASSMACRO_H

@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/19.
 //
 
-#ifndef WORKENGINE_LOGGER_H
-#define WORKENGINE_LOGGER_H
+#ifndef WORLDENGINE_LOGGER_H
+#define WORLDENGINE_LOGGER_H
 
 #include "Core/BasicType/BasicType.h"
 #include "Core/BasicType/String.h"
@@ -39,4 +39,4 @@ namespace Logger
 
 }  // namespace Logger
 
-#endif  // WORKENGINE_LOGGER_H
+#endif  // WORLDENGINE_LOGGER_H

@@ -1,8 +1,8 @@
 //
 // Created by WeslyChen on 2024/1/29.
 //
-#ifndef WORKENGINE_WINDOWAPP_H
-#define WORKENGINE_WINDOWAPP_H
+#ifndef WORLDENGINE_WINDOWAPP_H
+#define WORLDENGINE_WINDOWAPP_H
 
 #include "App.h"
 
@@ -22,4 +22,4 @@ private:
     Impl* mImpl = nullptr;
 };
 
-#endif  // WORKENGINE_WINDOWAPP_H
+#endif  // WORLDENGINE_WINDOWAPP_H

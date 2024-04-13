@@ -2,8 +2,8 @@
 // Created by chenwei on 2024/1/10.
 //
 
-#ifndef WORKENGINE_BASICTYPE_H
-#define WORKENGINE_BASICTYPE_H
+#ifndef WORLDENGINE_BASICTYPE_H
+#define WORLDENGINE_BASICTYPE_H
 
 #include <stdint.h>
 
@@ -16,4 +16,4 @@ using int16 = int16_t;
 using int32 = int32_t;
 using int64 = int64_t;
 
-#endif  // WORKENGINE_BASICTYPE_H
+#endif  // WORLDENGINE_BASICTYPE_H

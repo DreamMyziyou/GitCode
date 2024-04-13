@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#ifndef WORKENGINE_IWINDOW_H
-#define WORKENGINE_IWINDOW_H
+#ifndef WORLDENGINE_IWINDOW_H
+#define WORLDENGINE_IWINDOW_H
 
 #include "Engine.h"
 
@@ -23,4 +23,4 @@ namespace Render
 
 }  // namespace Render
 
-#endif  // WORKENGINE_IWINDOW_H
+#endif  // WORLDENGINE_IWINDOW_H

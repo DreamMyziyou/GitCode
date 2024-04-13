@@ -1,8 +1,8 @@
 //
 // Created by WeslyChen on 2024/1/28.
 //
-#ifndef WORKENGINE_VULKANSYNCWRAPPER_H
-#define WORKENGINE_VULKANSYNCWRAPPER_H
+#ifndef WORLDENGINE_VULKANSYNCWRAPPER_H
+#define WORLDENGINE_VULKANSYNCWRAPPER_H
 
 #include "IVulkanSubSystem.h"
 #include "VkRCenter.h"
@@ -31,4 +31,4 @@ private:
     std::vector<VkFence> mInFlightFences;
 };
 
-#endif  // WORKENGINE_VULKANSYNCWRAPPER_H
+#endif  // WORLDENGINE_VULKANSYNCWRAPPER_H

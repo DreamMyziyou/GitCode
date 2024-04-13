@@ -2,8 +2,8 @@
 // Created by WeslyChen on 2024/1/20.
 //
 
-#ifndef WORKENGINE_WORLD_H
-#define WORKENGINE_WORLD_H
+#ifndef WORLDENGINE_WORLD_H
+#define WORLDENGINE_WORLD_H
 
 #include <entt/entity/registry.hpp>
 
@@ -17,4 +17,4 @@ namespace World
 
 }  // namespace World
 
-#endif  // WORKENGINE_WORLD_H
+#endif  // WORLDENGINE_WORLD_H
