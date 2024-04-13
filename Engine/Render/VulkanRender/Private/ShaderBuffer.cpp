@@ -30,7 +30,7 @@ void ShaderBuffer::OnMeshUpdate(const MeshComponent& mesh)
 void ShaderBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
@@ -44,9 +44,9 @@ void ShaderBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
                  stagingBufferMemory);
 
     void* data = nullptr;
-    vkMapMemory(deviceComponent->mLogicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+    vkMapMemory(deviceComponent->logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices.data(), (size_t)bufferSize);
-    vkUnmapMemory(deviceComponent->mLogicDevice, stagingBufferMemory);
+    vkUnmapMemory(deviceComponent->logicDevice, stagingBufferMemory);
 
     CreateBuffer(bufferSize,
                  VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -56,14 +56,14 @@ void ShaderBuffer::CreateVertexBuffer(const std::vector<Vertex>& vertices)
 
     CopyBuffer(stagingBuffer, mVertexBuffer, bufferSize);
 
-    vkDestroyBuffer(deviceComponent->mLogicDevice, stagingBuffer, nullptr);
-    vkFreeMemory(deviceComponent->mLogicDevice, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(deviceComponent->logicDevice, stagingBuffer, nullptr);
+    vkFreeMemory(deviceComponent->logicDevice, stagingBufferMemory, nullptr);
 }
 
 void ShaderBuffer::CreateIndexBuffer(const vector<uint16>& indices)
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
@@ -77,9 +77,9 @@ void ShaderBuffer::CreateIndexBuffer(const vector<uint16>& indices)
                  stagingBufferMemory);
 
     void* data = nullptr;
-    vkMapMemory(deviceComponent->mLogicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+    vkMapMemory(deviceComponent->logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, indices.data(), (size_t)bufferSize);
-    vkUnmapMemory(deviceComponent->mLogicDevice, stagingBufferMemory);
+    vkUnmapMemory(deviceComponent->logicDevice, stagingBufferMemory);
 
     CreateBuffer(bufferSize,
                  VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
@@ -89,14 +89,14 @@ void ShaderBuffer::CreateIndexBuffer(const vector<uint16>& indices)
 
     CopyBuffer(stagingBuffer, mIndexBuffer, bufferSize);
 
-    vkDestroyBuffer(deviceComponent->mLogicDevice, stagingBuffer, nullptr);
-    vkFreeMemory(deviceComponent->mLogicDevice, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(deviceComponent->logicDevice, stagingBuffer, nullptr);
+    vkFreeMemory(deviceComponent->logicDevice, stagingBufferMemory, nullptr);
 }
 
 void ShaderBuffer::CreateUniformBuffers()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
@@ -113,7 +113,7 @@ void ShaderBuffer::CreateUniformBuffers()
                      mUniformBuffers[i],
                      mUniformBuffersMemory[i]);
 
-        vkMapMemory(deviceComponent->mLogicDevice, mUniformBuffersMemory[i], 0, bufferSize, 0, &mUniformBuffersMapped[i]);
+        vkMapMemory(deviceComponent->logicDevice, mUniformBuffersMemory[i], 0, bufferSize, 0, &mUniformBuffersMapped[i]);
     }
 }
 
@@ -121,7 +121,7 @@ void ShaderBuffer::CreateBuffer(
         VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkBufferCreateInfo bufferInfo{};
@@ -130,39 +130,39 @@ void ShaderBuffer::CreateBuffer(
     bufferInfo.usage = usage;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    auto vkResult = vkCreateBuffer(deviceComponent->mLogicDevice, &bufferInfo, nullptr, &buffer);
+    auto vkResult = vkCreateBuffer(deviceComponent->logicDevice, &bufferInfo, nullptr, &buffer);
     if (vkResult != VK_SUCCESS)
         return;
 
     VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(deviceComponent->mLogicDevice, buffer, &memRequirements);
+    vkGetBufferMemoryRequirements(deviceComponent->logicDevice, buffer, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     allocInfo.memoryTypeIndex = deviceComponent->FindMemoryType(memRequirements.memoryTypeBits, properties);
 
-    vkResult = vkAllocateMemory(deviceComponent->mLogicDevice, &allocInfo, nullptr, &bufferMemory);
+    vkResult = vkAllocateMemory(deviceComponent->logicDevice, &allocInfo, nullptr, &bufferMemory);
     if (vkResult != VK_SUCCESS)
         return;
 
-    vkBindBufferMemory(deviceComponent->mLogicDevice, buffer, bufferMemory, 0);
+    vkBindBufferMemory(deviceComponent->logicDevice, buffer, bufferMemory, 0);
 }
 
 void ShaderBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = deviceComponent->mCommandPool;
+    allocInfo.commandPool = deviceComponent->commandPool;
     allocInfo.commandBufferCount = 1;
 
     VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(deviceComponent->mLogicDevice, &allocInfo, &commandBuffer);
+    vkAllocateCommandBuffers(deviceComponent->logicDevice, &allocInfo, &commandBuffer);
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -181,46 +181,46 @@ void ShaderBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSi
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
-    vkQueueSubmit(deviceComponent->mGraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(deviceComponent->mGraphicsQueue);
+    vkQueueSubmit(deviceComponent->graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(deviceComponent->graphicsQueue);
 
-    vkFreeCommandBuffers(deviceComponent->mLogicDevice, deviceComponent->mCommandPool, 1, &commandBuffer);
+    vkFreeCommandBuffers(deviceComponent->logicDevice, deviceComponent->commandPool, 1, &commandBuffer);
 }
 
 void ShaderBuffer::ReleaseBuffer()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     if (mVertexBuffer)
     {
-        vkDestroyBuffer(deviceComponent->mLogicDevice, mVertexBuffer, nullptr);
+        vkDestroyBuffer(deviceComponent->logicDevice, mVertexBuffer, nullptr);
         mVertexBuffer = nullptr;
     }
 
     if (mVertexBufferMemory)
     {
-        vkFreeMemory(deviceComponent->mLogicDevice, mVertexBufferMemory, nullptr);
+        vkFreeMemory(deviceComponent->logicDevice, mVertexBufferMemory, nullptr);
         mVertexBufferMemory = nullptr;
     }
 
     if (mIndexBuffer)
     {
-        vkDestroyBuffer(deviceComponent->mLogicDevice, mIndexBuffer, nullptr);
+        vkDestroyBuffer(deviceComponent->logicDevice, mIndexBuffer, nullptr);
         mIndexBuffer = nullptr;
     }
 
     if (mIndexBufferMemory)
     {
-        vkFreeMemory(deviceComponent->mLogicDevice, mIndexBufferMemory, nullptr);
+        vkFreeMemory(deviceComponent->logicDevice, mIndexBufferMemory, nullptr);
         mIndexBufferMemory = nullptr;
     }
 
     for (size_t i = 0; i < VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroyBuffer(deviceComponent->mLogicDevice, mUniformBuffers[i], nullptr);
-        vkFreeMemory(deviceComponent->mLogicDevice, mUniformBuffersMemory[i], nullptr);
+        vkDestroyBuffer(deviceComponent->logicDevice, mUniformBuffers[i], nullptr);
+        vkFreeMemory(deviceComponent->logicDevice, mUniformBuffersMemory[i], nullptr);
     }
     mUniformBuffers.clear();
     mUniformBuffersMemory.clear();

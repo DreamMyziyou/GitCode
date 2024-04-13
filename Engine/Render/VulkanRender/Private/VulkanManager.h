@@ -9,12 +9,8 @@
 #include <vector>
 
 #include "Core/ModuleCore/ModuleSingleton.h"
-#include "VulkanDeviceSystem.h"
 #include "VulkanGraphicsPipeline.h"
-#include "VulkanInstanceSystem.h"
 #include "VulkanRender.h"
-#include "VulkanRenderPass.h"
-#include "VulkanSurfaceSystem.h"
 #include "VulkanSwapChainWrapper.h"
 
 class GlfwWindowSystem;
@@ -30,7 +26,6 @@ public:
     void Run() override;
 
 public:
-    VkRenderPass GetRenderPass() const { return mRenderPass->GetRenderPass(); }
     std::shared_ptr<VulkanGraphicsPipeline> GetPipelineWrapper() const { return mPipeline; }
     std::shared_ptr<VulkanSwapChainWrapper> GetSwapChainWrapper() const { return mSwapChain; }
 
@@ -42,8 +37,6 @@ private:
     std::vector<std::shared_ptr<IVulkanSubSystem>> mSystemStack{};
 
     std::shared_ptr<GlfwWindowSystem> mMainWindow = nullptr;
-
-    std::shared_ptr<VulkanRenderPass> mRenderPass = nullptr;
     std::shared_ptr<VulkanGraphicsPipeline> mPipeline = nullptr;
     std::shared_ptr<VulkanSwapChainWrapper> mSwapChain = nullptr;
 };

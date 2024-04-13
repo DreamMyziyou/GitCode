@@ -1,18 +1,18 @@
 //
 // Created by WeslyChen on 2024/1/28.
 //
-#include "VulkanRenderPass.h"
-
 #include "VulkanComponent.h"
-#include "VulkanManager.h"
+#include "VulkanRenderPassSystem.h"
 
-void VulkanRenderPass::OnInit()
+void VulkanRenderPassSystem::OnInit()
 {
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
+        return;
+    if (VkRCenter::instance()->GetComponentFromVulkan<VulkanRenderPassComponent>())
         return;
 
     VkAttachmentDescription colorAttachment{};
@@ -42,22 +42,27 @@ void VulkanRenderPass::OnInit()
     renderPassInfo.pSubpasses = &subpass;
 
     VkRenderPass renderPass;
-    auto vkResult = vkCreateRenderPass(deviceComponent->mLogicDevice, &renderPassInfo, nullptr, &renderPass);
+    auto vkResult = vkCreateRenderPass(deviceComponent->logicDevice, &renderPassInfo, nullptr, &renderPass);
     if (vkResult != VK_SUCCESS)
         return;
-    mRenderPass = renderPass;
+
+    auto& renderPassComponent = VkRCenter::instance()->world.emplace<VulkanRenderPassComponent>(VkRCenter::instance()->vulkanEntity);
+    renderPassComponent.renderPass = renderPass;
 }
 
-void VulkanRenderPass::OnDestroy()
+void VulkanRenderPassSystem::OnDestroy()
 {
-    if (nullptr == mRenderPass)
-        return;
-    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    auto renderPassComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanRenderPassComponent>();
+    if (!renderPassComponent)
         return;
 
-    vkDestroyRenderPass(deviceComponent->mLogicDevice, mRenderPass, nullptr);
-    mRenderPass = nullptr;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
+        return;
+
+    vkDestroyRenderPass(deviceComponent->logicDevice, renderPassComponent->renderPass, nullptr);
+
+    VkRCenter::instance()->world.remove<VulkanRenderPassComponent>(VkRCenter::instance()->vulkanEntity);
 }
 
-void VulkanRenderPass::OnUpdate() {}
+void VulkanRenderPassSystem::OnUpdate() {}

@@ -6,6 +6,10 @@
 
 #include "GlfwWindowSystem.h"
 #include "VulkanComponent.h"
+#include "VulkanDeviceSystem.h"
+#include "VulkanInstanceSystem.h"
+#include "VulkanRenderPassSystem.h"
+#include "VulkanSurfaceSystem.h"
 
 using namespace std;
 
@@ -19,9 +23,7 @@ void VulkanManager::StartupModule()
     mSystemStack.push_back(make_shared<VulkanInstanceSystem>());
     mSystemStack.push_back(make_shared<VulkanSurfaceSystem>());
     mSystemStack.push_back(make_shared<VulkanDeviceSystem>());
-
-    mRenderPass = make_shared<VulkanRenderPass>();
-    mSystemStack.push_back(mRenderPass);
+    mSystemStack.push_back(make_shared<VulkanRenderPassSystem>());
 
     mPipeline = make_shared<VulkanGraphicsPipeline>();
     mSystemStack.push_back(mPipeline);
@@ -48,7 +50,7 @@ void VulkanManager::Run()
     if (!pWindowComponent || !pWindowComponent->window)
         return;
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->logicDevice)
         return;
 
     mMainWindow->CheckUpdate();
@@ -59,7 +61,7 @@ void VulkanManager::Run()
         mMainWindow->DrawFrame();
     }
 
-    vkDeviceWaitIdle(deviceComponent->mLogicDevice);
+    vkDeviceWaitIdle(deviceComponent->logicDevice);
 }
 
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
@@ -79,7 +81,7 @@ void VulkanManager::ReCreateSwapChain()
     if (!surfaceComponent)
         return;
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     auto window = windowComponent->window;
@@ -91,9 +93,9 @@ void VulkanManager::ReCreateSwapChain()
         glfwWaitEvents();
     }
 
-    vkDeviceWaitIdle(deviceComponent->mLogicDevice);
+    vkDeviceWaitIdle(deviceComponent->logicDevice);
 
-    surfaceComponent->update(deviceComponent->mPhysicalDevice);
+    surfaceComponent->update(deviceComponent->physicalDevice);
     mSwapChain->OnDestroy();
     mSwapChain->OnInit();
 }

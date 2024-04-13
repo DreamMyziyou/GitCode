@@ -19,7 +19,10 @@ using namespace std;
 void VulkanGraphicsPipeline::OnInit()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
+        return;
+    auto renderPassComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanRenderPassComponent>();
+    if (!renderPassComponent)
         return;
 
     mShaderBuffer = make_unique<ShaderBuffer>();
@@ -106,7 +109,7 @@ void VulkanGraphicsPipeline::OnInit()
     pipelineLayoutInfo.pushConstantRangeCount = 0;  // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr;  // Optional
 
-    auto vkResult = vkCreatePipelineLayout(deviceComponent->mLogicDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout);
+    auto vkResult = vkCreatePipelineLayout(deviceComponent->logicDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout);
     if (vkResult != VK_SUCCESS)
         return;
 
@@ -127,13 +130,13 @@ void VulkanGraphicsPipeline::OnInit()
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.layout = pipelineLayout;
-    pipelineInfo.renderPass = VulkanManager::instance()->GetRenderPass();
+    pipelineInfo.renderPass = renderPassComponent->renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;  // Optional
     pipelineInfo.basePipelineIndex = -1;  // Optional
 
     VkPipeline graphicsPipeline;
-    vkResult = vkCreateGraphicsPipelines(deviceComponent->mLogicDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline);
+    vkResult = vkCreateGraphicsPipelines(deviceComponent->logicDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline);
     if (vkResult != VK_SUCCESS)
         return;
     mPipeline = graphicsPipeline;
@@ -142,12 +145,12 @@ void VulkanGraphicsPipeline::OnInit()
 void VulkanGraphicsPipeline::OnDestroy()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     if (mPipeline)
     {
-        vkDestroyPipeline(deviceComponent->mLogicDevice, mPipeline, nullptr);
+        vkDestroyPipeline(deviceComponent->logicDevice, mPipeline, nullptr);
         mPipeline = nullptr;
     }
 
@@ -165,19 +168,19 @@ void VulkanGraphicsPipeline::OnDestroy()
 
     if (mPipelineLayout)
     {
-        vkDestroyPipelineLayout(deviceComponent->mLogicDevice, mPipelineLayout, nullptr);
+        vkDestroyPipelineLayout(deviceComponent->logicDevice, mPipelineLayout, nullptr);
         mPipelineLayout = nullptr;
     }
 
     if (mDescriptorPool)
     {
-        vkDestroyDescriptorPool(deviceComponent->mLogicDevice, mDescriptorPool, nullptr);
+        vkDestroyDescriptorPool(deviceComponent->logicDevice, mDescriptorPool, nullptr);
         mDescriptorPool = nullptr;
     }
 
     if (mDescriptorSetLayout)
     {
-        vkDestroyDescriptorSetLayout(deviceComponent->mLogicDevice, mDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(deviceComponent->logicDevice, mDescriptorSetLayout, nullptr);
         mDescriptorSetLayout = nullptr;
     }
 
@@ -189,20 +192,20 @@ void VulkanGraphicsPipeline::OnUpdate() {}
 void VulkanGraphicsPipeline::DrawCall()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
-    auto commandBuffer = deviceComponent->mCommandBuffers[mCurrentFrame];
-    auto inFlightFence = deviceComponent->mInFlightFences[mCurrentFrame];
-    auto imageAvailableSemaphore = deviceComponent->mImageAvailableSemaphores[mCurrentFrame];
-    auto renderFinishedSemaphore = deviceComponent->mRenderFinishedSemaphores[mCurrentFrame];
+    auto commandBuffer = deviceComponent->commandBuffers[mCurrentFrame];
+    auto inFlightFence = deviceComponent->inFlightFences[mCurrentFrame];
+    auto imageAvailableSemaphore = deviceComponent->imageAvailableSemaphores[mCurrentFrame];
+    auto renderFinishedSemaphore = deviceComponent->renderFinishedSemaphores[mCurrentFrame];
     auto swapChain = VulkanManager::instance()->GetSwapChainWrapper()->GetSwapChain();
 
-    vkWaitForFences(deviceComponent->mLogicDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+    vkWaitForFences(deviceComponent->logicDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
     VkResult result =
-            vkAcquireNextImageKHR(deviceComponent->mLogicDevice, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+            vkAcquireNextImageKHR(deviceComponent->logicDevice, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
@@ -212,7 +215,7 @@ void VulkanGraphicsPipeline::DrawCall()
 
     UpdateUniformBuffer(mCurrentFrame);
 
-    vkResetFences(deviceComponent->mLogicDevice, 1, &inFlightFence);
+    vkResetFences(deviceComponent->logicDevice, 1, &inFlightFence);
 
     vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
     RecordCommandBuffer(commandBuffer, imageIndex);
@@ -229,7 +232,7 @@ void VulkanGraphicsPipeline::DrawCall()
     VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
-    if (vkQueueSubmit(deviceComponent->mGraphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS)
+    if (vkQueueSubmit(deviceComponent->graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS)
         return;
 
     VkPresentInfoKHR presentInfo{};
@@ -240,7 +243,7 @@ void VulkanGraphicsPipeline::DrawCall()
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &imageIndex;
-    result = vkQueuePresentKHR(deviceComponent->mPresentQueue, &presentInfo);
+    result = vkQueuePresentKHR(deviceComponent->presentQueue, &presentInfo);
 
     auto view = VkRCenter::instance()->world.view<WindowResizeComponent>();
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || !view.empty())
@@ -277,7 +280,7 @@ void VulkanGraphicsPipeline::CreateDefaultShader()
 void VulkanGraphicsPipeline::CreateDescriptorPool()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkDescriptorPoolSize poolSize{};
@@ -290,13 +293,13 @@ void VulkanGraphicsPipeline::CreateDescriptorPool()
     poolInfo.pPoolSizes = &poolSize;
     poolInfo.maxSets = static_cast<uint32_t>(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
 
-    vkCreateDescriptorPool(deviceComponent->mLogicDevice, &poolInfo, nullptr, &mDescriptorPool);
+    vkCreateDescriptorPool(deviceComponent->logicDevice, &poolInfo, nullptr, &mDescriptorPool);
 }
 
 void VulkanGraphicsPipeline::CreateDescriptorSets()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     std::vector<VkDescriptorSetLayout> layouts(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT, mDescriptorSetLayout);
@@ -307,7 +310,7 @@ void VulkanGraphicsPipeline::CreateDescriptorSets()
     allocInfo.pSetLayouts = layouts.data();
 
     mDescriptorSets.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
-    if (vkAllocateDescriptorSets(deviceComponent->mLogicDevice, &allocInfo, mDescriptorSets.data()) != VK_SUCCESS)
+    if (vkAllocateDescriptorSets(deviceComponent->logicDevice, &allocInfo, mDescriptorSets.data()) != VK_SUCCESS)
         return;
 
     for (size_t i = 0; i < VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT; i++)
@@ -326,14 +329,14 @@ void VulkanGraphicsPipeline::CreateDescriptorSets()
         descriptorWrite.descriptorCount = 1;
         descriptorWrite.pBufferInfo = &bufferInfo;
 
-        vkUpdateDescriptorSets(deviceComponent->mLogicDevice, 1, &descriptorWrite, 0, nullptr);
+        vkUpdateDescriptorSets(deviceComponent->logicDevice, 1, &descriptorWrite, 0, nullptr);
     }
 }
 
 void VulkanGraphicsPipeline::CreateDescriptorSetLayout()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
@@ -348,11 +351,15 @@ void VulkanGraphicsPipeline::CreateDescriptorSetLayout()
     layoutInfo.bindingCount = 1;
     layoutInfo.pBindings = &uboLayoutBinding;
 
-    vkCreateDescriptorSetLayout(deviceComponent->mLogicDevice, &layoutInfo, nullptr, &mDescriptorSetLayout);
+    vkCreateDescriptorSetLayout(deviceComponent->logicDevice, &layoutInfo, nullptr, &mDescriptorSetLayout);
 }
 
 void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
+    auto renderPassComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanRenderPassComponent>();
+    if (!renderPassComponent)
+        return;
+
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0;  // Optional
@@ -367,7 +374,7 @@ void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, 
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = VulkanManager::instance()->GetRenderPass();
+    renderPassInfo.renderPass = renderPassComponent->renderPass;
     renderPassInfo.framebuffer = swapChainWrapper->GetBuffer(imageIndex);
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = swapChainExtent;

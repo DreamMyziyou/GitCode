@@ -14,7 +14,7 @@ void VulkanShaderWrapper::OnInit()
     if (mShader)
         return;
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
     vector<char> buffer;
@@ -34,7 +34,7 @@ void VulkanShaderWrapper::OnInit()
     createInfo.pCode = reinterpret_cast<const uint32_t*>(buffer.data());
 
     VkShaderModule shaderModule;
-    auto vkResult = vkCreateShaderModule(deviceComponent->mLogicDevice, &createInfo, nullptr, &shaderModule);
+    auto vkResult = vkCreateShaderModule(deviceComponent->logicDevice, &createInfo, nullptr, &shaderModule);
     if (vkResult != VkResult::VK_SUCCESS)
         return;
     mShader = shaderModule;
@@ -51,10 +51,10 @@ void VulkanShaderWrapper::OnDestroy()
     if (nullptr == mShader)
         return;
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+    if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
 
-    vkDestroyShaderModule(deviceComponent->mLogicDevice, mShader, nullptr);
+    vkDestroyShaderModule(deviceComponent->logicDevice, mShader, nullptr);
     mShader = nullptr;
 }
 

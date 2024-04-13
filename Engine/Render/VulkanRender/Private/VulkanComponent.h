@@ -48,18 +48,23 @@ struct VulkanDeviceComponent
 {
     constexpr static int MAX_FRAMES_IN_FLIGHT = 2;
 
-    VkPhysicalDevice mPhysicalDevice = nullptr;
-    VkDevice mLogicDevice = nullptr;
-    VkQueue mGraphicsQueue = nullptr;
-    VkQueue mPresentQueue = nullptr;
-    VkCommandPool mCommandPool = nullptr;
+    VkPhysicalDevice physicalDevice = nullptr;
+    VkDevice logicDevice = nullptr;
+    VkQueue graphicsQueue = nullptr;
+    VkQueue presentQueue = nullptr;
+    VkCommandPool commandPool = nullptr;
 
-    std::vector<VkCommandBuffer> mCommandBuffers;
-    std::vector<VkSemaphore> mImageAvailableSemaphores;
-    std::vector<VkSemaphore> mRenderFinishedSemaphores;
-    std::vector<VkFence> mInFlightFences;
+    std::vector<VkCommandBuffer> commandBuffers;
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
 
     uint32 FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+};
+
+struct VulkanRenderPassComponent
+{
+    VkRenderPass renderPass = nullptr;
 };
 
 #endif  // WORLDENGINE_VULKANCOMPONENT_H

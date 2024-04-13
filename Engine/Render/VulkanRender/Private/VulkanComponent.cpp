@@ -116,11 +116,11 @@ void VulkanSurfaceComponent::update(VkPhysicalDevice device)
 
 uint32 VulkanDeviceComponent::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const
 {
-    if (!mLogicDevice)
+    if (!logicDevice)
         return 0;
 
     VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(mPhysicalDevice, &memProperties);
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
     {
