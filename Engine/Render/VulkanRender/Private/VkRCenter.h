@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <optional>
+#include <set>
 #include <vector>
 
 #include "Core/World/World.h"
@@ -23,10 +24,12 @@ class VkRCenter final
 {
     SINGLETON_CLASS(VkRCenter)
 
-    entt::registry world;
+    entt::registry world{};
 
     entt::entity windowEntity = entt::null;
     entt::entity vulkanEntity = entt::null;
+
+    entt::entity activePipelineEntity = entt::null;
 
     template <typename T>
     T* GetComponentFromWindow()
@@ -44,6 +47,15 @@ class VkRCenter final
             return nullptr;
 
         return world.try_get<T>(vulkanEntity);
+    }
+
+    template <typename T>
+    T* GetComponentFromActivePipeline()
+    {
+        if (activePipelineEntity == entt::null)
+            return nullptr;
+
+        return world.try_get<T>(activePipelineEntity);
     }
 };
 

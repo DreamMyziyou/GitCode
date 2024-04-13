@@ -1,7 +1,7 @@
 //
 // Created by WeslyChen on 2024/1/26.
 //
-#include "VulkanGraphicsPipeline.h"
+#include "VulkanGraphicsPipelineSystem.h"
 
 #include <chrono>
 
@@ -10,13 +10,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "GlfwWindowComponent.h"
+#include "PipelineComponent.h"
 #include "UniformBuffer.h"
 #include "VulkanComponent.h"
 #include "VulkanManager.h"
 
 using namespace std;
 
-void VulkanGraphicsPipeline::OnInit()
+void VulkanGraphicsPipelineSystem::OnInit()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
     if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
@@ -24,6 +25,12 @@ void VulkanGraphicsPipeline::OnInit()
     auto renderPassComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanRenderPassComponent>();
     if (!renderPassComponent)
         return;
+    if (VkRCenter::instance()->activePipelineEntity != entt::null)
+        return;
+
+    auto& pipelineEntity = VkRCenter::instance()->activePipelineEntity;
+    pipelineEntity = VkRCenter::instance()->world.create();
+    auto& pipelineComponent = VkRCenter::instance()->world.emplace<PipelineComponent>(pipelineEntity);
 
     mShaderBuffer = make_unique<ShaderBuffer>();
     CreateDefaultShader();
@@ -105,7 +112,7 @@ void VulkanGraphicsPipeline::OnInit()
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &mDescriptorSetLayout;
+    pipelineLayoutInfo.pSetLayouts = &pipelineComponent.mDescriptorSetLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 0;  // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr;  // Optional
 
@@ -113,7 +120,7 @@ void VulkanGraphicsPipeline::OnInit()
     if (vkResult != VK_SUCCESS)
         return;
 
-    mPipelineLayout = pipelineLayout;
+    pipelineComponent.mPipelineLayout = pipelineLayout;
 
     VkPipelineShaderStageCreateInfo shaderStages[] = {mVertexShader->GetShaderCreateInfo(), mFragShader->GetShaderCreateInfo()};
 
@@ -139,19 +146,24 @@ void VulkanGraphicsPipeline::OnInit()
     vkResult = vkCreateGraphicsPipelines(deviceComponent->logicDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline);
     if (vkResult != VK_SUCCESS)
         return;
-    mPipeline = graphicsPipeline;
+    pipelineComponent.mPipeline = graphicsPipeline;
 }
 
-void VulkanGraphicsPipeline::OnDestroy()
+void VulkanGraphicsPipelineSystem::OnDestroy()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
     if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
+    if (VkRCenter::instance()->activePipelineEntity == entt::null)
+        return;
+    auto pipelineComponent = VkRCenter::instance()->GetComponentFromActivePipeline<PipelineComponent>();
+    if (!pipelineComponent)
+        return;
 
-    if (mPipeline)
+    if (pipelineComponent->mPipeline)
     {
-        vkDestroyPipeline(deviceComponent->logicDevice, mPipeline, nullptr);
-        mPipeline = nullptr;
+        vkDestroyPipeline(deviceComponent->logicDevice, pipelineComponent->mPipeline, nullptr);
+        pipelineComponent->mPipeline = nullptr;
     }
 
     if (mVertexShader)
@@ -166,30 +178,59 @@ void VulkanGraphicsPipeline::OnDestroy()
         mFragShader = nullptr;
     }
 
-    if (mPipelineLayout)
+    if (pipelineComponent->mPipelineLayout)
     {
-        vkDestroyPipelineLayout(deviceComponent->logicDevice, mPipelineLayout, nullptr);
-        mPipelineLayout = nullptr;
+        vkDestroyPipelineLayout(deviceComponent->logicDevice, pipelineComponent->mPipelineLayout, nullptr);
+        pipelineComponent->mPipelineLayout = nullptr;
     }
 
-    if (mDescriptorPool)
+    if (pipelineComponent->mDescriptorPool)
     {
-        vkDestroyDescriptorPool(deviceComponent->logicDevice, mDescriptorPool, nullptr);
-        mDescriptorPool = nullptr;
+        vkDestroyDescriptorPool(deviceComponent->logicDevice, pipelineComponent->mDescriptorPool, nullptr);
+        pipelineComponent->mDescriptorPool = nullptr;
     }
 
-    if (mDescriptorSetLayout)
+    if (pipelineComponent->mDescriptorSetLayout)
     {
-        vkDestroyDescriptorSetLayout(deviceComponent->logicDevice, mDescriptorSetLayout, nullptr);
-        mDescriptorSetLayout = nullptr;
+        vkDestroyDescriptorSetLayout(deviceComponent->logicDevice, pipelineComponent->mDescriptorSetLayout, nullptr);
+        pipelineComponent->mDescriptorSetLayout = nullptr;
     }
 
     mShaderBuffer = nullptr;
+
+    VkRCenter::instance()->world.destroy(VkRCenter::instance()->activePipelineEntity);
+    VkRCenter::instance()->activePipelineEntity = entt::null;
 }
 
-void VulkanGraphicsPipeline::OnUpdate() {}
+void VulkanGraphicsPipelineSystem::OnUpdate()
+{
+    auto world = World::GetWorld();
+    auto positionView = world->view<MeshComponent>();
+    for (const auto& [entityKey, mesh] : positionView.each())
+    {
+        // test
+        OnMeshUpdate(mesh);
+        mesh.dirty = false;
+        break;
+    }
 
-void VulkanGraphicsPipeline::DrawCall()
+    auto pWindowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
+    if (!pWindowComponent || !pWindowComponent->window)
+        return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->logicDevice)
+        return;
+
+    while (!glfwWindowShouldClose(pWindowComponent->window))
+    {
+        glfwPollEvents();
+        DrawCall();
+    }
+
+    vkDeviceWaitIdle(deviceComponent->logicDevice);
+}
+
+void VulkanGraphicsPipelineSystem::DrawCall()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
     if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
@@ -257,15 +298,17 @@ void VulkanGraphicsPipeline::DrawCall()
     mCurrentFrame = (mCurrentFrame + 1) % VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT;
 }
 
-void VulkanGraphicsPipeline::OnMeshUpdate(const MeshComponent& mesh)
+void VulkanGraphicsPipelineSystem::OnMeshUpdate(const MeshComponent& mesh)
 {
     if (!mShaderBuffer)
+        return;
+    if (!mesh.dirty)
         return;
 
     mShaderBuffer->OnMeshUpdate(mesh);
 }
 
-void VulkanGraphicsPipeline::CreateDefaultShader()
+void VulkanGraphicsPipelineSystem::CreateDefaultShader()
 {
     mVertexShader = make_shared<VulkanVertexShaderWrapper>();
     mVertexShader->SetShaderPath("Shader/Base.vert.spv");
@@ -277,10 +320,13 @@ void VulkanGraphicsPipeline::CreateDefaultShader()
     mFragShader->OnInit();
 }
 
-void VulkanGraphicsPipeline::CreateDescriptorPool()
+void VulkanGraphicsPipelineSystem::CreateDescriptorPool()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
     if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
+        return;
+    auto pipelineComponent = VkRCenter::instance()->GetComponentFromActivePipeline<PipelineComponent>();
+    if (!pipelineComponent)
         return;
 
     VkDescriptorPoolSize poolSize{};
@@ -293,24 +339,27 @@ void VulkanGraphicsPipeline::CreateDescriptorPool()
     poolInfo.pPoolSizes = &poolSize;
     poolInfo.maxSets = static_cast<uint32_t>(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
 
-    vkCreateDescriptorPool(deviceComponent->logicDevice, &poolInfo, nullptr, &mDescriptorPool);
+    vkCreateDescriptorPool(deviceComponent->logicDevice, &poolInfo, nullptr, &pipelineComponent->mDescriptorPool);
 }
 
-void VulkanGraphicsPipeline::CreateDescriptorSets()
+void VulkanGraphicsPipelineSystem::CreateDescriptorSets()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
     if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
         return;
+    auto pipelineComponent = VkRCenter::instance()->GetComponentFromActivePipeline<PipelineComponent>();
+    if (!pipelineComponent)
+        return;
 
-    std::vector<VkDescriptorSetLayout> layouts(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT, mDescriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT, pipelineComponent->mDescriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    allocInfo.descriptorPool = mDescriptorPool;
+    allocInfo.descriptorPool = pipelineComponent->mDescriptorPool;
     allocInfo.descriptorSetCount = static_cast<uint32_t>(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
 
-    mDescriptorSets.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
-    if (vkAllocateDescriptorSets(deviceComponent->logicDevice, &allocInfo, mDescriptorSets.data()) != VK_SUCCESS)
+    pipelineComponent->mDescriptorSets.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
+    if (vkAllocateDescriptorSets(deviceComponent->logicDevice, &allocInfo, pipelineComponent->mDescriptorSets.data()) != VK_SUCCESS)
         return;
 
     for (size_t i = 0; i < VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT; i++)
@@ -322,7 +371,7 @@ void VulkanGraphicsPipeline::CreateDescriptorSets()
 
         VkWriteDescriptorSet descriptorWrite{};
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrite.dstSet = mDescriptorSets[i];
+        descriptorWrite.dstSet = pipelineComponent->mDescriptorSets[i];
         descriptorWrite.dstBinding = 0;
         descriptorWrite.dstArrayElement = 0;
         descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -333,10 +382,13 @@ void VulkanGraphicsPipeline::CreateDescriptorSets()
     }
 }
 
-void VulkanGraphicsPipeline::CreateDescriptorSetLayout()
+void VulkanGraphicsPipelineSystem::CreateDescriptorSetLayout()
 {
     auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
     if (!deviceComponent || !deviceComponent->physicalDevice || !deviceComponent->logicDevice)
+        return;
+    auto pipelineComponent = VkRCenter::instance()->GetComponentFromActivePipeline<PipelineComponent>();
+    if (!pipelineComponent)
         return;
 
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
@@ -351,13 +403,16 @@ void VulkanGraphicsPipeline::CreateDescriptorSetLayout()
     layoutInfo.bindingCount = 1;
     layoutInfo.pBindings = &uboLayoutBinding;
 
-    vkCreateDescriptorSetLayout(deviceComponent->logicDevice, &layoutInfo, nullptr, &mDescriptorSetLayout);
+    vkCreateDescriptorSetLayout(deviceComponent->logicDevice, &layoutInfo, nullptr, &pipelineComponent->mDescriptorSetLayout);
 }
 
-void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+void VulkanGraphicsPipelineSystem::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
     auto renderPassComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanRenderPassComponent>();
     if (!renderPassComponent)
+        return;
+    auto pipelineComponent = VkRCenter::instance()->GetComponentFromActivePipeline<PipelineComponent>();
+    if (!pipelineComponent)
         return;
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -370,7 +425,6 @@ void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, 
 
     auto swapChainWrapper = VulkanManager::instance()->GetSwapChainWrapper();
     auto swapChainExtent = swapChainWrapper->GetSwapChainExtent();
-    auto graphicsPipeline = VulkanManager::instance()->GetPipelineWrapper()->GetPipeline();
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -385,7 +439,7 @@ void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, 
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineComponent->mPipeline);
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -407,7 +461,14 @@ void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, 
 
     vkCmdBindIndexBuffer(commandBuffer, mShaderBuffer->GetIndexBufferHandle(), 0, VK_INDEX_TYPE_UINT16);
 
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0, 1, &mDescriptorSets[mCurrentFrame], 0, nullptr);
+    vkCmdBindDescriptorSets(commandBuffer,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipelineComponent->mPipelineLayout,
+                            0,
+                            1,
+                            &pipelineComponent->mDescriptorSets[mCurrentFrame],
+                            0,
+                            nullptr);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mShaderBuffer->GetIndexSize()), 1, 0, 0, 0);
 
@@ -416,7 +477,7 @@ void VulkanGraphicsPipeline::RecordCommandBuffer(VkCommandBuffer commandBuffer, 
     vkEndCommandBuffer(commandBuffer);
 }
 
-void VulkanGraphicsPipeline::UpdateUniformBuffer(uint32_t currentImage)
+void VulkanGraphicsPipelineSystem::UpdateUniformBuffer(uint32_t currentImage)
 {
     static auto startTime = std::chrono::high_resolution_clock::now();
 

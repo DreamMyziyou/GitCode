@@ -1,20 +1,20 @@
 //
 // Created by WeslyChen on 2024/1/26.
 //
-#ifndef WORLDENGINE_VULKANGRAPHICSPIPELINE_H
-#define WORLDENGINE_VULKANGRAPHICSPIPELINE_H
+#ifndef WORLDENGINE_VULKANGRAPHICSPIPELINESYSTEM_H
+#define WORLDENGINE_VULKANGRAPHICSPIPELINESYSTEM_H
 
 #include "ShaderBuffer.h"
 #include "VkRCenter.h"
 #include "VulkanVertexShaderWrapper.h"
 
-class VulkanGraphicsPipeline final : public IVulkanSubSystem
+class VulkanGraphicsPipelineSystem final : public IVulkanSubSystem
 {
 public:
-    VulkanGraphicsPipeline() = default;
-    ~VulkanGraphicsPipeline() override = default;
-    VulkanGraphicsPipeline(const VulkanGraphicsPipeline&) = delete;
-    VulkanGraphicsPipeline& operator=(const VulkanGraphicsPipeline&) = delete;
+    VulkanGraphicsPipelineSystem() = default;
+    ~VulkanGraphicsPipelineSystem() override = default;
+    VulkanGraphicsPipelineSystem(const VulkanGraphicsPipelineSystem&) = delete;
+    VulkanGraphicsPipelineSystem& operator=(const VulkanGraphicsPipelineSystem&) = delete;
 
 public:
     void OnInit() override;
@@ -22,8 +22,6 @@ public:
     void OnUpdate() override;
 
 public:
-    VkPipeline GetPipeline() const { return mPipeline; }
-
     void DrawCall();
 
     void OnMeshUpdate(const MeshComponent& mesh);
@@ -38,12 +36,6 @@ private:
     void UpdateUniformBuffer(uint32_t currentImage);
 
 private:
-    VkDescriptorPool mDescriptorPool = nullptr;
-    VkDescriptorSetLayout mDescriptorSetLayout = nullptr;
-    std::vector<VkDescriptorSet> mDescriptorSets;
-    VkPipelineLayout mPipelineLayout = nullptr;
-    VkPipeline mPipeline = nullptr;
-
     std::unique_ptr<ShaderBuffer> mShaderBuffer = nullptr;
     std::shared_ptr<VulkanVertexShaderWrapper> mVertexShader = nullptr;
     std::shared_ptr<VulkanShaderWrapper> mFragShader = nullptr;
@@ -51,4 +43,4 @@ private:
     int mCurrentFrame = 0;
 };
 
-#endif  // WORLDENGINE_VULKANGRAPHICSPIPELINE_H
+#endif  // WORLDENGINE_VULKANGRAPHICSPIPELINESYSTEM_H

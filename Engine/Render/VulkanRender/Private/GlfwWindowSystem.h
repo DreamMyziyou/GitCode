@@ -22,10 +22,6 @@ public:
     void OnDestroy() override;
     void OnUpdate() override;
 
-public:
-    void CheckUpdate();
-    void DrawFrame();
-
 private:
     static void OnFramebufferResize(GLFWwindow* window, int width, int height);
 };

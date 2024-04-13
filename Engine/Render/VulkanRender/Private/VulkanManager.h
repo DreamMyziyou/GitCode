@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "Core/ModuleCore/ModuleSingleton.h"
-#include "VulkanGraphicsPipeline.h"
 #include "VulkanRender.h"
 #include "VulkanSwapChainWrapper.h"
 
@@ -26,7 +25,6 @@ public:
     void Run() override;
 
 public:
-    std::shared_ptr<VulkanGraphicsPipeline> GetPipelineWrapper() const { return mPipeline; }
     std::shared_ptr<VulkanSwapChainWrapper> GetSwapChainWrapper() const { return mSwapChain; }
 
     Render::IMainWindow* CreateMainWindow(int width, int height, String title);
@@ -37,7 +35,6 @@ private:
     std::vector<std::shared_ptr<IVulkanSubSystem>> mSystemStack{};
 
     std::shared_ptr<GlfwWindowSystem> mMainWindow = nullptr;
-    std::shared_ptr<VulkanGraphicsPipeline> mPipeline = nullptr;
     std::shared_ptr<VulkanSwapChainWrapper> mSwapChain = nullptr;
 };
 

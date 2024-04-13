@@ -46,31 +46,6 @@ void GlfwWindowSystem::OnDestroy()
 
 void GlfwWindowSystem::OnUpdate() {}
 
-void GlfwWindowSystem::CheckUpdate()
-{
-    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
-    if (!pipeline)
-        return;
-
-    auto world = World::GetWorld();
-    auto positionView = world->view<MeshComponent>();
-    for (const auto& [entityKey, mesh] : positionView.each())
-    {
-        // test
-        pipeline->OnMeshUpdate(mesh);
-        break;
-    }
-}
-
-void GlfwWindowSystem::DrawFrame()
-{
-    auto pipeline = VulkanManager::instance()->GetPipelineWrapper();
-    if (!pipeline)
-        return;
-
-    pipeline->DrawCall();
-}
-
 void GlfwWindowSystem::OnFramebufferResize(GLFWwindow* window, int width, int height)
 {
     auto& world = VkRCenter::instance()->world;

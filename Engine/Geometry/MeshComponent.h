@@ -11,7 +11,7 @@
 
 struct MeshComponent
 {
-    int dirtyVersion = 0;
+    bool dirty = true;
     std::vector<Vertex> vertices;
     std::vector<uint16> indices;
 };

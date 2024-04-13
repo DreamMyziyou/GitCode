@@ -7,6 +7,7 @@
 #include "GlfwWindowSystem.h"
 #include "VulkanComponent.h"
 #include "VulkanDeviceSystem.h"
+#include "VulkanGraphicsPipelineSystem.h"
 #include "VulkanInstanceSystem.h"
 #include "VulkanRenderPassSystem.h"
 #include "VulkanSurfaceSystem.h"
@@ -24,9 +25,7 @@ void VulkanManager::StartupModule()
     mSystemStack.push_back(make_shared<VulkanSurfaceSystem>());
     mSystemStack.push_back(make_shared<VulkanDeviceSystem>());
     mSystemStack.push_back(make_shared<VulkanRenderPassSystem>());
-
-    mPipeline = make_shared<VulkanGraphicsPipeline>();
-    mSystemStack.push_back(mPipeline);
+    mSystemStack.push_back(make_shared<VulkanGraphicsPipelineSystem>());
 
     mSwapChain = make_shared<VulkanSwapChainWrapper>();
     mSystemStack.push_back(mSwapChain);
@@ -46,22 +45,8 @@ void VulkanManager::ShutdownModule()
 
 void VulkanManager::Run()
 {
-    auto pWindowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
-    if (!pWindowComponent || !pWindowComponent->window)
-        return;
-    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
-    if (!deviceComponent || !deviceComponent->logicDevice)
-        return;
-
-    mMainWindow->CheckUpdate();
-
-    while (!glfwWindowShouldClose(pWindowComponent->window))
-    {
-        glfwPollEvents();
-        mMainWindow->DrawFrame();
-    }
-
-    vkDeviceWaitIdle(deviceComponent->logicDevice);
+    for (const auto& system : mSystemStack)
+        system->OnUpdate();
 }
 
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
