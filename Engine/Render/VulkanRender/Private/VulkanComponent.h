@@ -44,4 +44,22 @@ struct VulkanSurfaceComponent
     void update(VkPhysicalDevice device);
 };
 
+struct VulkanDeviceComponent
+{
+    constexpr static int MAX_FRAMES_IN_FLIGHT = 2;
+
+    VkPhysicalDevice mPhysicalDevice = nullptr;
+    VkDevice mLogicDevice = nullptr;
+    VkQueue mGraphicsQueue = nullptr;
+    VkQueue mPresentQueue = nullptr;
+    VkCommandPool mCommandPool = nullptr;
+
+    std::vector<VkCommandBuffer> mCommandBuffers;
+    std::vector<VkSemaphore> mImageAvailableSemaphores;
+    std::vector<VkSemaphore> mRenderFinishedSemaphores;
+    std::vector<VkFence> mInFlightFences;
+
+    uint32 FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+};
+
 #endif  // WORLDENGINE_VULKANCOMPONENT_H

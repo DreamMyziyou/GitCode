@@ -2,7 +2,7 @@
 // Created by WeslyChen on 2024/1/21.
 //
 
-#include "VulkanDeviceWrapper.h"
+#include "VulkanDeviceSystem.h"
 
 #include <map>
 #include <set>
@@ -15,48 +15,44 @@ using namespace std;
 
 static const vector<const char*> gDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-void VulkanDeviceWrapper::OnInit()
+void VulkanDeviceSystem::OnInit()
 {
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (deviceComponent)
+        return;
+
+    VkRCenter::instance()->world.emplace<VulkanDeviceComponent>(VkRCenter::instance()->vulkanEntity);
+
     CreatePhysicalDevice();
     CreateLogicDevice();
     CreateCommand();
-
-    mSyncObject = make_shared<VulkanSyncWrapper>();
-    mSyncObject->OnInit();
+    CreateSync();
 }
 
-void VulkanDeviceWrapper::OnDestroy()
+void VulkanDeviceSystem::OnDestroy()
 {
-    if (nullptr == mSyncObject)
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
         return;
 
-    mSyncObject->OnDestroy();
-    mSyncObject = nullptr;
+    for (auto& item : deviceComponent->mImageAvailableSemaphores)
+        vkDestroySemaphore(deviceComponent->mLogicDevice, item, nullptr);
+    deviceComponent->mImageAvailableSemaphores.clear();
+    for (auto& item : deviceComponent->mRenderFinishedSemaphores)
+        vkDestroySemaphore(deviceComponent->mLogicDevice, item, nullptr);
+    deviceComponent->mRenderFinishedSemaphores.clear();
+    for (auto& item : deviceComponent->mInFlightFences)
+        vkDestroyFence(deviceComponent->mLogicDevice, item, nullptr);
+    deviceComponent->mInFlightFences.clear();
 
-    vkDestroyCommandPool(mLogicDevice, mCommandPool, nullptr);
-    mCommandPool = nullptr;
-
-    vkDestroyDevice(mLogicDevice, nullptr);
-    mLogicDevice = nullptr;
+    vkDestroyCommandPool(deviceComponent->mLogicDevice, deviceComponent->mCommandPool, nullptr);
+    vkDestroyDevice(deviceComponent->mLogicDevice, nullptr);
+    VkRCenter::instance()->world.remove<VulkanDeviceComponent>(VkRCenter::instance()->vulkanEntity);
 }
 
-void VulkanDeviceWrapper::OnUpdate() {}
+void VulkanDeviceSystem::OnUpdate() {}
 
-uint32 VulkanDeviceWrapper::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
-{
-    VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(mPhysicalDevice, &memProperties);
-
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
-    {
-        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
-            return i;
-    }
-
-    return 0;
-}
-
-bool VulkanDeviceWrapper::CheckDeviceExtensionSupport(VkPhysicalDevice device) const
+bool VulkanDeviceSystem::CheckDeviceExtensionSupport(VkPhysicalDevice device) const
 {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -72,7 +68,7 @@ bool VulkanDeviceWrapper::CheckDeviceExtensionSupport(VkPhysicalDevice device) c
     return requiredExtensions.empty();
 }
 
-bool VulkanDeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
+bool VulkanDeviceSystem::IsDeviceSuitable(VkPhysicalDevice device) const
 {
     if (!device)
         return false;
@@ -98,7 +94,7 @@ bool VulkanDeviceWrapper::IsDeviceSuitable(VkPhysicalDevice device) const
     return true;
 }
 
-int32 VulkanDeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
+int32 VulkanDeviceSystem::ScoreDeviceSuitability(VkPhysicalDevice device) const
 {
     if (!IsDeviceSuitable(device))
         return 0;
@@ -125,11 +121,10 @@ int32 VulkanDeviceWrapper::ScoreDeviceSuitability(VkPhysicalDevice device) const
     return score;
 }
 
-void VulkanDeviceWrapper::CreatePhysicalDevice()
+void VulkanDeviceSystem::CreatePhysicalDevice()
 {
     auto vulkanComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanInstanceComponent>();
-    if (!vulkanComponent)
-        return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
 
     // Get device
     uint32 deviceCount = 0;
@@ -149,26 +144,26 @@ void VulkanDeviceWrapper::CreatePhysicalDevice()
 
     // Check if the best candidate is suitable at all
     if (candidates.rbegin()->first > 0)
-        mPhysicalDevice = candidates.rbegin()->second;
+        deviceComponent->mPhysicalDevice = candidates.rbegin()->second;
     else
         return Logger::LogFatal("VulkanRender", "Failed to find a suitable GPU!");
 
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
-    surfaceComponent->update(mPhysicalDevice);
+    surfaceComponent->update(deviceComponent->mPhysicalDevice);
 }
 
-void VulkanDeviceWrapper::CreateLogicDevice()
+void VulkanDeviceSystem::CreateLogicDevice()
 {
-    if (!mPhysicalDevice)
-        return;
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice)
+        return;
 
-    auto indices = surfaceComponent->FindQueueFamilies(mPhysicalDevice);
-
+    auto indices = surfaceComponent->FindQueueFamilies(deviceComponent->mPhysicalDevice);
     vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
@@ -193,34 +188,71 @@ void VulkanDeviceWrapper::CreateLogicDevice()
     createInfo.enabledExtensionCount = static_cast<uint32_t>(gDeviceExtensions.size());
     createInfo.ppEnabledExtensionNames = gDeviceExtensions.data();
 
-    if (vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mLogicDevice) != VK_SUCCESS)
+    if (vkCreateDevice(deviceComponent->mPhysicalDevice, &createInfo, nullptr, &deviceComponent->mLogicDevice) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "Failed to create logical device!");
 
-    vkGetDeviceQueue(mLogicDevice, indices.graphicsFamily.value(), 0, &mGraphicsQueue);
-    vkGetDeviceQueue(mLogicDevice, indices.presentFamily.value(), 0, &mPresentQueue);
+    vkGetDeviceQueue(deviceComponent->mLogicDevice, indices.graphicsFamily.value(), 0, &deviceComponent->mGraphicsQueue);
+    vkGetDeviceQueue(deviceComponent->mLogicDevice, indices.presentFamily.value(), 0, &deviceComponent->mPresentQueue);
 }
 
-void VulkanDeviceWrapper::CreateCommand()
+void VulkanDeviceSystem::CreateCommand()
 {
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
-    auto indices = surfaceComponent->FindQueueFamilies(mPhysicalDevice);
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice)
+        return;
+
+    auto indices = surfaceComponent->FindQueueFamilies(deviceComponent->mPhysicalDevice);
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
     VkCommandPool commandPool;
-    auto vkResult = vkCreateCommandPool(mLogicDevice, &poolInfo, nullptr, &commandPool);
+    auto vkResult = vkCreateCommandPool(deviceComponent->mLogicDevice, &poolInfo, nullptr, &commandPool);
     if (vkResult != VkResult::VK_SUCCESS)
         return;
-    mCommandPool = commandPool;
+    deviceComponent->mCommandPool = commandPool;
 
-    mCommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    deviceComponent->mCommandBuffers.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t)mCommandBuffers.size();
-    vkAllocateCommandBuffers(mLogicDevice, &allocInfo, mCommandBuffers.data());
+    allocInfo.commandBufferCount = (uint32_t)deviceComponent->mCommandBuffers.size();
+    vkAllocateCommandBuffers(deviceComponent->mLogicDevice, &allocInfo, deviceComponent->mCommandBuffers.data());
+}
+
+void VulkanDeviceSystem::CreateSync()
+{
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+        return;
+
+    deviceComponent->mImageAvailableSemaphores.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
+    deviceComponent->mRenderFinishedSemaphores.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
+    deviceComponent->mInFlightFences.resize(VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT);
+
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    for (size_t i = 0; i < VulkanDeviceComponent::MAX_FRAMES_IN_FLIGHT; ++i)
+    {
+        auto vkResult = vkCreateSemaphore(deviceComponent->mLogicDevice, &semaphoreInfo, nullptr, &deviceComponent->mImageAvailableSemaphores[i]);
+        if (vkResult != VK_SUCCESS)
+            return;
+
+        vkResult = vkCreateSemaphore(deviceComponent->mLogicDevice, &semaphoreInfo, nullptr, &deviceComponent->mRenderFinishedSemaphores[i]);
+        if (vkResult != VK_SUCCESS)
+            return;
+
+        vkResult = vkCreateFence(deviceComponent->mLogicDevice, &fenceInfo, nullptr, &deviceComponent->mInFlightFences[i]);
+        if (vkResult != VK_SUCCESS)
+            return;
+    }
 }

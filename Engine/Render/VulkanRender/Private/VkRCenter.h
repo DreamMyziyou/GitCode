@@ -19,8 +19,6 @@
 #include "Core/World/World.h"
 #include "Engine.h"
 
-constexpr int MAX_FRAMES_IN_FLIGHT = 2;
-
 class VkRCenter final
 {
     SINGLETON_CLASS(VkRCenter)

@@ -113,3 +113,20 @@ void VulkanSurfaceComponent::update(VkPhysicalDevice device)
         imageCount = swapChainSupport.capabilities.maxImageCount;
     expectSwapChainBufferCount = imageCount;
 }
+
+uint32 VulkanDeviceComponent::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const
+{
+    if (!mLogicDevice)
+        return 0;
+
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(mPhysicalDevice, &memProperties);
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            return i;
+    }
+
+    return 0;
+}

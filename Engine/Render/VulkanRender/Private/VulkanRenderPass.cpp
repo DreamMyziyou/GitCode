@@ -11,6 +11,9 @@ void VulkanRenderPass::OnInit()
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+        return;
 
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = surfaceComponent->expectSurfaceFormat.format;
@@ -39,7 +42,7 @@ void VulkanRenderPass::OnInit()
     renderPassInfo.pSubpasses = &subpass;
 
     VkRenderPass renderPass;
-    auto vkResult = vkCreateRenderPass(VulkanManager::instance()->GetDevice(), &renderPassInfo, nullptr, &renderPass);
+    auto vkResult = vkCreateRenderPass(deviceComponent->mLogicDevice, &renderPassInfo, nullptr, &renderPass);
     if (vkResult != VK_SUCCESS)
         return;
     mRenderPass = renderPass;
@@ -49,8 +52,11 @@ void VulkanRenderPass::OnDestroy()
 {
     if (nullptr == mRenderPass)
         return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+        return;
 
-    vkDestroyRenderPass(VulkanManager::instance()->GetDevice(), mRenderPass, nullptr);
+    vkDestroyRenderPass(deviceComponent->mLogicDevice, mRenderPass, nullptr);
     mRenderPass = nullptr;
 }
 

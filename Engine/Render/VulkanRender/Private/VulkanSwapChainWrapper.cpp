@@ -18,19 +18,21 @@ void VulkanSwapChainWrapper::OnInit()
 
 void VulkanSwapChainWrapper::OnDestroy()
 {
-    auto device = VulkanManager::instance()->GetDevice();
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mLogicDevice)
+        return;
 
     for (auto framebuffer : mSwapChainFrameBuffers)
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
+        vkDestroyFramebuffer(deviceComponent->mLogicDevice, framebuffer, nullptr);
     mSwapChainFrameBuffers.clear();
 
     for (auto imageView : mSwapChainImageViews)
-        vkDestroyImageView(device, imageView, nullptr);
+        vkDestroyImageView(deviceComponent->mLogicDevice, imageView, nullptr);
     mSwapChainImageViews.clear();
 
     mSwapChainImages.clear();
 
-    vkDestroySwapchainKHR(device, mSwapChain, nullptr);
+    vkDestroySwapchainKHR(deviceComponent->mLogicDevice, mSwapChain, nullptr);
     mSwapChain = nullptr;
 }
 
@@ -41,15 +43,15 @@ void VulkanSwapChainWrapper::CreateSwapChain()
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+        return;
+
     auto expectFormat = surfaceComponent->expectSurfaceFormat;
     auto expectSwapExtent = surfaceComponent->expectSwapChainExtent;
     auto expectBufferCount = surfaceComponent->expectSwapChainBufferCount;
     auto presentMode = surfaceComponent->expectPresentMode;
     auto& surfaceCapabilities = surfaceComponent->surfaceCapabilities;
-
-    auto deviceWrapper = VulkanManager::instance()->GetDeviceWrapper();
-    auto physicalDevice = deviceWrapper->GetPhysicalDevice();
-    auto device = deviceWrapper->GetLogicDevice();
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -61,7 +63,7 @@ void VulkanSwapChainWrapper::CreateSwapChain()
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    auto indices = surfaceComponent->FindQueueFamilies(physicalDevice);
+    auto indices = surfaceComponent->FindQueueFamilies(deviceComponent->mPhysicalDevice);
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     if (indices.graphicsFamily != indices.presentFamily)
@@ -84,14 +86,14 @@ void VulkanSwapChainWrapper::CreateSwapChain()
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
     VkSwapchainKHR swapChain;
-    if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+    if (vkCreateSwapchainKHR(deviceComponent->mLogicDevice, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
         return Logger::LogFatal("VulkanRender", "failed to create swap chain!");
 
     mSwapChain = swapChain;
 
-    vkGetSwapchainImagesKHR(device, swapChain, &expectBufferCount, nullptr);
+    vkGetSwapchainImagesKHR(deviceComponent->mLogicDevice, swapChain, &expectBufferCount, nullptr);
     mSwapChainImages.resize(expectBufferCount);
-    vkGetSwapchainImagesKHR(device, swapChain, &expectBufferCount, mSwapChainImages.data());
+    vkGetSwapchainImagesKHR(deviceComponent->mLogicDevice, swapChain, &expectBufferCount, mSwapChainImages.data());
 
     mSwapChainImageFormat = expectFormat.format;
     mSwapChainExtent = expectSwapExtent;
@@ -108,6 +110,9 @@ VkFramebuffer VulkanSwapChainWrapper::GetBuffer(size_t bufferIndex) const
 void VulkanSwapChainWrapper::CreateImageViews()
 {
     if (mSwapChainImages.empty())
+        return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
         return;
 
     mSwapChainImageViews.resize(mSwapChainImages.size());
@@ -129,7 +134,7 @@ void VulkanSwapChainWrapper::CreateImageViews()
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(VulkanManager::instance()->GetDevice(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS)
+        if (vkCreateImageView(deviceComponent->mLogicDevice, &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS)
             Logger::LogFatal("VulkanRender", "failed to create image views!");
     }
 }
@@ -137,6 +142,9 @@ void VulkanSwapChainWrapper::CreateImageViews()
 void VulkanSwapChainWrapper::CreateFrameBuffers()
 {
     if (mSwapChainImageViews.empty())
+        return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
         return;
 
     mSwapChainFrameBuffers.resize(mSwapChainImageViews.size());
@@ -152,7 +160,7 @@ void VulkanSwapChainWrapper::CreateFrameBuffers()
         framebufferInfo.width = mSwapChainExtent.width;
         framebufferInfo.height = mSwapChainExtent.height;
         framebufferInfo.layers = 1;
-        if (vkCreateFramebuffer(VulkanManager::instance()->GetDevice(), &framebufferInfo, nullptr, &mSwapChainFrameBuffers[i]) != VK_SUCCESS)
+        if (vkCreateFramebuffer(deviceComponent->mLogicDevice, &framebufferInfo, nullptr, &mSwapChainFrameBuffers[i]) != VK_SUCCESS)
             Logger::LogFatal("VulkanRender", "failed to create framebuffer!");
     }
 }

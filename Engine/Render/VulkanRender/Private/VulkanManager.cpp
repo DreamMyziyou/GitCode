@@ -18,9 +18,7 @@ void VulkanManager::StartupModule()
 
     mSystemStack.push_back(make_shared<VulkanInstanceSystem>());
     mSystemStack.push_back(make_shared<VulkanSurfaceSystem>());
-
-    mDevice = make_shared<VulkanDeviceWrapper>();
-    mSystemStack.push_back(mDevice);
+    mSystemStack.push_back(make_shared<VulkanDeviceSystem>());
 
     mRenderPass = make_shared<VulkanRenderPass>();
     mSystemStack.push_back(mRenderPass);
@@ -49,6 +47,9 @@ void VulkanManager::Run()
     auto pWindowComponent = VkRCenter::instance()->GetComponentFromWindow<GlfwWindowComponent>();
     if (!pWindowComponent || !pWindowComponent->window)
         return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mLogicDevice)
+        return;
 
     mMainWindow->CheckUpdate();
 
@@ -58,7 +59,7 @@ void VulkanManager::Run()
         mMainWindow->DrawFrame();
     }
 
-    vkDeviceWaitIdle(VulkanManager::instance()->GetDeviceWrapper()->GetLogicDevice());
+    vkDeviceWaitIdle(deviceComponent->mLogicDevice);
 }
 
 Render::IMainWindow* VulkanManager::CreateMainWindow(int width, int height, String title)
@@ -77,6 +78,9 @@ void VulkanManager::ReCreateSwapChain()
     auto surfaceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanSurfaceComponent>();
     if (!surfaceComponent)
         return;
+    auto deviceComponent = VkRCenter::instance()->GetComponentFromVulkan<VulkanDeviceComponent>();
+    if (!deviceComponent || !deviceComponent->mPhysicalDevice || !deviceComponent->mLogicDevice)
+        return;
 
     auto window = windowComponent->window;
     int width = 0, height = 0;
@@ -87,9 +91,9 @@ void VulkanManager::ReCreateSwapChain()
         glfwWaitEvents();
     }
 
-    vkDeviceWaitIdle(GetDevice());
+    vkDeviceWaitIdle(deviceComponent->mLogicDevice);
 
-    surfaceComponent->update(mDevice->GetPhysicalDevice());
+    surfaceComponent->update(deviceComponent->mPhysicalDevice);
     mSwapChain->OnDestroy();
     mSwapChain->OnInit();
 }
